@@ -1,0 +1,2 @@
+class SMBus(object):
+    pass
