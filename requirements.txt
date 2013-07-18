@@ -1,0 +1,6 @@
+argparse==1.2.1
+cffi==0.6
+py==1.4.15
+pycparser==2.09.1
+pytest==2.3.5
+wsgiref==0.1.2
