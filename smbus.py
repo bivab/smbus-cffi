@@ -25,22 +25,44 @@ modules.
 Because the I2C device interface is opened R/W, users of this
 module usually must have root permissions."""
 
+from util import validate
+MAXPATH=16
+
 from cffi import FFI
 ffi = FFI()
 ffi.cdef("""
 #define O_RDWR ...
 int open(const char *pathname, int flags, int mode);
+int ioctl(int d, int request, ...);
 """)
 C = ffi.verify("""
 #include <fcntl.h>
+#include <sys/ioctl.h>
 """)
 
-MAXPATH=16
+smbus_ffi = FFI()
+smbus_ffi.cdef("""
+#define I2C_SLAVE ...
+#define I2C_SMBUS_WRITE ...
+
+typedef unsigned char __u8;
+typedef int32_t __s32;
+
+static inline __s32 i2c_smbus_write_quick(int file, __u8 value);
+extern inline __s32 i2c_smbus_read_byte(int file);
+extern inline __s32 i2c_smbus_write_byte(int file, __u8 value);
+""")
+SMBUS = smbus_ffi.verify("""
+#include <sys/types.h>
+#include <linux/i2c-dev.h>
+""")
 
 class SMBus(object):
-    fd = -1
-    addr = -1
-    pec = 0
+    """Return a new SMBus object that is (optionally) connected to the
+    specified I2C device interface."""
+    _fd = -1
+    _addr = -1
+    _pec = 0
 
     def __init__(self, bus=-1):
         if bus >= 0:
@@ -48,23 +70,180 @@ class SMBus(object):
 
     def close(self):
         """Disconnects the object from the bus."""
-        if self.fd != -1 and close(self.fd):
+        if self._fd != -1 and close(self._fd):
             raise IOError
-        self.fd = -1
-        self.addr = -1
-        self.pec = 0
+        self._fd = -1
+        self._addr = -1
+        self._pec = 0
 
     def dealloc(self):
         self.close()
 
     def open(self, bus):
-	"""Connects the object to the specified SMBus."""
+        """Connects the object to the specified SMBus."""
         bus = int(bus)
         path = "/dev/i2c-%d" % (bus,)
         if len(path) >= MAXPATH:
                 raise OverflowError("Bus number is invalid.")
 
-        self.fd = C.open(path, C.O_RDWR, 0)
-        if self.fd == -1:
+        self._fd = C.open(path, C.O_RDWR, 0)
+        if self._fd == -1:
             raise IOError(ffi.errno)
 
+    def _set_addr(self, addr):
+        """private helper function, 0 => success, !0 => error"""
+        ret = 0
+        if self._addr != addr:
+            ret = C.ioctl(self._fd, SMBUS.I2C_SLAVE, ffi.cast("int", addr))
+            self._addr = addr
+        if ret != 0:
+            raise IOError(ffi.errno)
+
+    @validate(addr=int)
+    def write_quick(self, addr):
+        """Perform SMBus Quick transaction."""
+        self._set_addr(addr)
+        if SMBUS.i2c_smbus_write_quick(self._fd, SMBUS.I2C_SMBUS_WRITE) != 0:
+            raise IOError(ffi.errno)
+
+    @validate(addr=int)
+    def read_byte(self, addr):
+        """Perform SMBus Write Byte transaction."""
+        self._set_addr(addr)
+        result = SMBUS.i2c_smbus_read_byte(self._fd)
+        if result == -1:
+            raise IOError(ffi.errno)
+        return result
+
+    @validate(addr=int, val=int)
+    def write_byte(self, addr, val):
+        self._set_addr(addr)
+        if SMBUS.i2c_smbus_write_byte(self._fd, ffi.cast("unsigned char", val)) == -1:
+            raise IOError(ffi.errno)
+
+    @validate(addr=int, cmd=int)
+    def read_byte_data(self, addr, cmd):
+        self._set_addr(addr)
+        result = SMBUS.i2c_smbus_read_byte_data(self._fd, ffi.cast("unsigned char", cmd))
+        if result == -1:
+            raise IOError(ffi.errno)
+        return result
+
+    @validate(addr=int, cmd=int, val=int)
+    def write_byte_data(self, addr, cmd, val):
+        self._set_addr(addr)
+        if SMBUS.i2c_smbus_write_byte_data(self._fd, 
+            ffi.cast("unsigned char", cmd),
+            ffi.cast("unsigned char", val)) == -1:
+            raise IOError(ffi.errno)
+
+
+    @validate(addr=int, cmd=int)
+    def read_word_data(self, addr, cmd):
+        self._set_addr(addr)
+        result = SMBUS.i2c_smbus_read_word_data(self.fd, ffi.cast("unsigned char", cmd))
+        if result == -1:
+            raise IOError(ffi.errno)
+        return result
+
+    @validate(addr=int, cmd=int, val=int)
+    def write_word_data(self, addr, cmd, val):
+        self._set_addr(addr)
+        if SMBUS.i2c_smbus_write_word_data(self.fd,
+            ffi.cast("unsigned char", cmd),
+            ffi.cast("unsigned short", val)) == -1:
+            raise IOError(ffi.errno)
+
+    @validate(addr=int, cmd=int, val=int)
+    def process_call(self, addr, cmd, val):
+        self._set_addr(addr)
+        if SMBUS.i2c_smbus_process_call(self.fd,
+            ffi.cast("unsigned char", cmd),
+            ffi.cast("unsigned char", val)) == -1:
+            raise IOError(ffi.errno)
+
+    @validate(addr=int, cmd=int)
+    def read_block_data(self, addr, cmd):
+        self._set_addr(addr)
+        data = ffi.new("union i2c_smbus_data")
+        if SMBUS.i2c_smbus_access(self.fd, SMBUS.I2C_SMBUS_READ,
+                                  ffi.cast("unsigned char", cmd),
+                                  SMBUS.I2C_SMBUS_BLOCK_DATA,
+                                  data):
+            raise IOError(ffi.errno)
+        return smbus_data_to_list(data.block)
+        
+    @validate(addr=int, cmd=int, vals=list)
+    def write_block_data(self, addr, cmd, vals):
+        self._set_addr(addr)
+        data = ffi.new("union i2c_smbus_data")
+        list_to_smbus_data(data, vals)  
+        if SMBUS.i2c_smbus_access(self.fd, SMBUS.I2C_SMBUS_WRITE, 
+                                  ffi.cast("unsigned char", cmd), 
+                                  SMBUS.I2C_SMBUS_BLOCK_DATA,
+                                  data):
+            raise IOError(ffi.errno)
+
+    @validate(addr=int, cmd=int, len=int)
+    def block_process_call(self, addr, cmd, vals):
+        self._set_addr(addr)
+        data = ffi.new("union i2c_smbus_data")
+        list_to_smbus_data(data, vals)  
+        if SMBUS.i2c_smbus_access(self.fd, SMBUS.I2C_SMBUS_WRITE,
+                                  ffi.cast("unsigned char", cmd), 
+                                  SMBUS.I2C_SMBUS_BLOCK_PROC_CALL,
+                                  data):
+            raise IOError(ffi.errno)
+        return smbus_data_to_list(data.block)
+
+    @validate(addr=int, cmd=int, len=list)
+    def read_i2c_block_data(addr, cmd, len=32):
+        self._set_addr(addr)
+        data = ffi.new("union i2c_smbus_data")
+        data.block[0] = len
+        arg = SMBUS.I2C_SMBUS_I2C_BLOCK_BROKENi if len == 32 else SMBUS.I2C_SMBUS_I2C_BLOCK_DATA
+        if SMBUS.i2c_smbus_access(self.fd,
+                                  SMBUS.I2C_SMBUS_READ,
+                                  ffi.cast("unsigned char", cmd), 
+                                  arg, data):
+            raise IOError(ffi.errno)
+        return smbus_data_to_list(data.block)
+
+    @validate(addr=int, cmd=int, vals=list)
+    def write_i2c_block_data(addr, cmd, vals):
+        self._set_addr(addr)
+        data = ffi.new("union i2c_smbus_data")
+        list_to_smbus_data(data, vals)  
+        if SMBUS.i2c_smbus_access(self.fd, SMBUS.I2C_SMBUS_WRITE,
+                                  ffi.cast("unsigned char", cmd), 
+                                  SMBUS.I2C_SMBUS_I2C_BLOCK_BROKEN,
+                                  data):
+            raise IOError(ffi.errno)
+       
+    @property
+    def pec(self):
+        return self._pec
+
+    @pec.setter
+    def pec(self, value):
+        if value is None:
+          raise TypeError("Cannot delete attribute")
+        # XXX make sure it is kind of boolean-ish
+        value = bool(value)
+        if pec != self._pec:
+            if C.ioctl(self.df, SMBUS.I2C_PEC, ffi.cast("int", pec)):
+                raise IOError(ffi.errno)
+            self._pec = pec
+        
+
+
+def smbus_data_to_list(block):
+    return [block[i+1] for i in range(block[0])]
+
+def list_to_smbus_data(data, vals):
+    if len(vals) > 32 or len(vals) == 0:
+        raise OverflowError("Third argument must be a list of at least one, "
+                            "but not more than 32 integers")
+    data.block[0] = len(vals)
+    for i, val in enumerate(vals):
+        data.block[i] = val
