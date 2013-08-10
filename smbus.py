@@ -33,27 +33,72 @@ ffi = FFI()
 ffi.cdef("""
 #define O_RDWR ...
 int open(const char *pathname, int flags, int mode);
+int close(int fd);
 int ioctl(int d, int request, ...);
 """)
 C = ffi.verify("""
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
 """)
 
 smbus_ffi = FFI()
 smbus_ffi.cdef("""
-#define I2C_SLAVE ...
-#define I2C_SMBUS_WRITE ...
-
 typedef unsigned char __u8;
 typedef int32_t __s32;
+typedef unsigned short int __u16;
+
+#define I2C_SLAVE ...
+
+/* smbus_access read or write markers */
+#define I2C_SMBUS_READ  ...
+#define I2C_SMBUS_WRITE ...
+
+/* SMBus transaction types (size parameter in the above functions) 
+   Note: these no longer correspond to the (arbitrary) PIIX4 internal codes! */
+#define I2C_SMBUS_QUICK             ...
+#define I2C_SMBUS_BYTE              ...
+#define I2C_SMBUS_BYTE_DATA         ...
+#define I2C_SMBUS_WORD_DATA         ...
+#define I2C_SMBUS_PROC_CALL         ...
+#define I2C_SMBUS_BLOCK_DATA        ...
+#define I2C_SMBUS_I2C_BLOCK_BROKEN  ...
+#define I2C_SMBUS_BLOCK_PROC_CALL   ...   /* SMBus 2.0 */
+#define I2C_SMBUS_I2C_BLOCK_DATA    ...
+
+/* 
+ * Data for SMBus Messages 
+ */
+//#define I2C_SMBUS_BLOCK_MAX	32	/* As specified in SMBus standard */	
+union i2c_smbus_data {
+	__u8 byte;
+	__u16 word;
+	__u8 block[34]; /* block[0] is used for length */
+	                                            /* and one more for PEC */
+};
+
+
+static inline __s32 i2c_smbus_access(int file, char read_write, __u8 command, int size, union i2c_smbus_data *data);
 
 static inline __s32 i2c_smbus_write_quick(int file, __u8 value);
-extern inline __s32 i2c_smbus_read_byte(int file);
-extern inline __s32 i2c_smbus_write_byte(int file, __u8 value);
+
+static inline __s32 i2c_smbus_read_byte(int file);
+static inline __s32 i2c_smbus_write_byte(int file, __u8 value);
+
+static inline __s32 i2c_smbus_read_byte_data(int file, __u8 command);
+static inline __s32 i2c_smbus_write_byte_data(int file, __u8 command, __u8 value);
+
+static inline __s32 i2c_smbus_read_word_data(int file, __u8 command);
+static inline __s32 i2c_smbus_write_word_data(int file, __u8 command, __u16 value);
+
+static inline __s32 i2c_smbus_process_call(int file, __u8 command, __u16 value);
+
+//static inline __s32 i2c_smbus_read_block_data(int file, __u8 command, __u8 *values)
+//static inline __s32 i2c_smbus_write_block_data(int file, __u8 command, __u8 length, const __u8 *values)
 """)
 SMBUS = smbus_ffi.verify("""
 #include <sys/types.h>
+#include <linux/i2c.h>
 #include <linux/i2c-dev.h>
 """)
 
