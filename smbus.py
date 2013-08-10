@@ -115,7 +115,7 @@ class SMBus(object):
 
     def close(self):
         """Disconnects the object from the bus."""
-        if self._fd != -1 and close(self._fd):
+        if self._fd != -1 and C.close(self._fd):
             raise IOError
         self._fd = -1
         self._addr = -1
@@ -143,6 +143,7 @@ class SMBus(object):
             self._addr = addr
         if ret != 0:
             raise IOError(ffi.errno)
+        return ret
 
     @validate(addr=int)
     def write_quick(self, addr):
@@ -186,7 +187,7 @@ class SMBus(object):
     @validate(addr=int, cmd=int)
     def read_word_data(self, addr, cmd):
         self._set_addr(addr)
-        result = SMBUS.i2c_smbus_read_word_data(self.fd, ffi.cast("unsigned char", cmd))
+        result = SMBUS.i2c_smbus_read_word_data(self._fd, ffi.cast("unsigned char", cmd))
         if result == -1:
             raise IOError(ffi.errno)
         return result
@@ -194,7 +195,7 @@ class SMBus(object):
     @validate(addr=int, cmd=int, val=int)
     def write_word_data(self, addr, cmd, val):
         self._set_addr(addr)
-        if SMBUS.i2c_smbus_write_word_data(self.fd,
+        if SMBUS.i2c_smbus_write_word_data(self._fd,
             ffi.cast("unsigned char", cmd),
             ffi.cast("unsigned short", val)) == -1:
             raise IOError(ffi.errno)
@@ -202,7 +203,7 @@ class SMBus(object):
     @validate(addr=int, cmd=int, val=int)
     def process_call(self, addr, cmd, val):
         self._set_addr(addr)
-        if SMBUS.i2c_smbus_process_call(self.fd,
+        if SMBUS.i2c_smbus_process_call(self._fd,
             ffi.cast("unsigned char", cmd),
             ffi.cast("unsigned char", val)) == -1:
             raise IOError(ffi.errno)
@@ -211,7 +212,7 @@ class SMBus(object):
     def read_block_data(self, addr, cmd):
         self._set_addr(addr)
         data = ffi.new("union i2c_smbus_data")
-        if SMBUS.i2c_smbus_access(self.fd, SMBUS.I2C_SMBUS_READ,
+        if SMBUS.i2c_smbus_access(self._fd, SMBUS.I2C_SMBUS_READ,
                                   ffi.cast("unsigned char", cmd),
                                   SMBUS.I2C_SMBUS_BLOCK_DATA,
                                   data):
@@ -223,7 +224,7 @@ class SMBus(object):
         self._set_addr(addr)
         data = ffi.new("union i2c_smbus_data")
         list_to_smbus_data(data, vals)  
-        if SMBUS.i2c_smbus_access(self.fd, SMBUS.I2C_SMBUS_WRITE, 
+        if SMBUS.i2c_smbus_access(self._fd, SMBUS.I2C_SMBUS_WRITE, 
                                   ffi.cast("unsigned char", cmd), 
                                   SMBUS.I2C_SMBUS_BLOCK_DATA,
                                   data):
@@ -234,7 +235,7 @@ class SMBus(object):
         self._set_addr(addr)
         data = ffi.new("union i2c_smbus_data")
         list_to_smbus_data(data, vals)  
-        if SMBUS.i2c_smbus_access(self.fd, SMBUS.I2C_SMBUS_WRITE,
+        if SMBUS.i2c_smbus_access(self._fd, SMBUS.I2C_SMBUS_WRITE,
                                   ffi.cast("unsigned char", cmd), 
                                   SMBUS.I2C_SMBUS_BLOCK_PROC_CALL,
                                   data):
@@ -246,8 +247,8 @@ class SMBus(object):
         self._set_addr(addr)
         data = ffi.new("union i2c_smbus_data")
         data.block[0] = len
-        arg = SMBUS.I2C_SMBUS_I2C_BLOCK_BROKENi if len == 32 else SMBUS.I2C_SMBUS_I2C_BLOCK_DATA
-        if SMBUS.i2c_smbus_access(self.fd,
+        arg = SMBUS.I2C_SMBUS_I2C_BLOCK_BROKEN if len == 32 else SMBUS.I2C_SMBUS_I2C_BLOCK_DATA
+        if SMBUS.i2c_smbus_access(self._fd,
                                   SMBUS.I2C_SMBUS_READ,
                                   ffi.cast("unsigned char", cmd), 
                                   arg, data):
@@ -259,7 +260,7 @@ class SMBus(object):
         self._set_addr(addr)
         data = ffi.new("union i2c_smbus_data")
         list_to_smbus_data(data, vals)  
-        if SMBUS.i2c_smbus_access(self.fd, SMBUS.I2C_SMBUS_WRITE,
+        if SMBUS.i2c_smbus_access(self._fd, SMBUS.I2C_SMBUS_WRITE,
                                   ffi.cast("unsigned char", cmd), 
                                   SMBUS.I2C_SMBUS_I2C_BLOCK_BROKEN,
                                   data):
@@ -276,7 +277,7 @@ class SMBus(object):
         # XXX make sure it is kind of boolean-ish
         value = bool(value)
         if pec != self._pec:
-            if C.ioctl(self.df, SMBUS.I2C_PEC, ffi.cast("int", pec)):
+            if C.ioctl(self._fd, SMBUS.I2C_PEC, ffi.cast("int", pec)):
                 raise IOError(ffi.errno)
             self._pec = pec
         
