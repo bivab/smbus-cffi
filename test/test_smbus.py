@@ -1,4 +1,4 @@
-from smbus import SMBus
+from smbus import SMBus, smbus_ffi, list_to_smbus_data, smbus_data_to_list
 import py
 
 
@@ -48,3 +48,19 @@ def test_write_quick():
     py.test.raises(TypeError, "bus.write_quick('a')")
     py.test.raises(IOError, "bus.write_quick(4)")
     bus.write_quick(1)
+
+
+def test_list_to_smbus_data():
+    lst = range(10)
+    data = smbus_ffi.new("union i2c_smbus_data *")
+    list_to_smbus_data(data, lst)
+    assert data.block[0] == 10
+    for i in lst:
+        assert data.block[i+1] == i
+
+
+def test_smbus_data_to_list():
+    lst = range(10)
+    data = smbus_ffi.new("union i2c_smbus_data *")
+    list_to_smbus_data(data, lst)
+    assert smbus_data_to_list(data) == range(10)

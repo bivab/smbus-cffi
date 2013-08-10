@@ -211,18 +211,18 @@ class SMBus(object):
     @validate(addr=int, cmd=int)
     def read_block_data(self, addr, cmd):
         self._set_addr(addr)
-        data = ffi.new("union i2c_smbus_data")
+        data = smbus_ffi.new("union i2c_smbus_data *")
         if SMBUS.i2c_smbus_access(self._fd, SMBUS.I2C_SMBUS_READ,
                                   ffi.cast("unsigned char", cmd),
                                   SMBUS.I2C_SMBUS_BLOCK_DATA,
                                   data):
             raise IOError(ffi.errno)
-        return smbus_data_to_list(data.block)
+        return smbus_data_to_list(block)
         
     @validate(addr=int, cmd=int, vals=list)
     def write_block_data(self, addr, cmd, vals):
         self._set_addr(addr)
-        data = ffi.new("union i2c_smbus_data")
+        data = smbus_ffi.new("union i2c_smbus_data *")
         list_to_smbus_data(data, vals)  
         if SMBUS.i2c_smbus_access(self._fd, SMBUS.I2C_SMBUS_WRITE, 
                                   ffi.cast("unsigned char", cmd), 
@@ -233,19 +233,19 @@ class SMBus(object):
     @validate(addr=int, cmd=int, len=int)
     def block_process_call(self, addr, cmd, vals):
         self._set_addr(addr)
-        data = ffi.new("union i2c_smbus_data")
+        data = smbus_ffi.new("union i2c_smbus_data *")
         list_to_smbus_data(data, vals)  
         if SMBUS.i2c_smbus_access(self._fd, SMBUS.I2C_SMBUS_WRITE,
                                   ffi.cast("unsigned char", cmd), 
                                   SMBUS.I2C_SMBUS_BLOCK_PROC_CALL,
                                   data):
             raise IOError(ffi.errno)
-        return smbus_data_to_list(data.block)
+        return smbus_data_to_list(block)
 
     @validate(addr=int, cmd=int, len=list)
     def read_i2c_block_data(addr, cmd, len=32):
         self._set_addr(addr)
-        data = ffi.new("union i2c_smbus_data")
+        data = smbus_ffi.new("union i2c_smbus_data *")
         data.block[0] = len
         arg = SMBUS.I2C_SMBUS_I2C_BLOCK_BROKEN if len == 32 else SMBUS.I2C_SMBUS_I2C_BLOCK_DATA
         if SMBUS.i2c_smbus_access(self._fd,
@@ -253,12 +253,12 @@ class SMBus(object):
                                   ffi.cast("unsigned char", cmd), 
                                   arg, data):
             raise IOError(ffi.errno)
-        return smbus_data_to_list(data.block)
+        return smbus_data_to_list(block)
 
     @validate(addr=int, cmd=int, vals=list)
     def write_i2c_block_data(addr, cmd, vals):
         self._set_addr(addr)
-        data = ffi.new("union i2c_smbus_data")
+        data = smbus_ffi.new("union i2c_smbus_data *")
         list_to_smbus_data(data, vals)  
         if SMBUS.i2c_smbus_access(self._fd, SMBUS.I2C_SMBUS_WRITE,
                                   ffi.cast("unsigned char", cmd), 
@@ -283,7 +283,8 @@ class SMBus(object):
         
 
 
-def smbus_data_to_list(block):
+def smbus_data_to_list(data):
+    block = data.block
     return [block[i+1] for i in range(block[0])]
 
 def list_to_smbus_data(data, vals):
@@ -292,4 +293,4 @@ def list_to_smbus_data(data, vals):
                             "but not more than 32 integers")
     data.block[0] = len(vals)
     for i, val in enumerate(vals):
-        data.block[i] = val
+        data.block[i + 1] = val
