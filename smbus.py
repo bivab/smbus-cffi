@@ -39,6 +39,7 @@ typedef int32_t __s32;
 typedef unsigned short int __u16;
 
 #define I2C_SLAVE ...
+#define I2C_PEC ...
 
 /* smbus_access read or write markers */
 #define I2C_SMBUS_READ  ...
@@ -254,10 +255,8 @@ class SMBus(object):
 
     @pec.setter
     def pec(self, value):
-        if value is None:
-          raise TypeError("Cannot delete attribute")
-        # XXX make sure it is kind of boolean-ish
-        value = bool(value)
+	"""True if Packet Error Codes (PEC) are enabled"""
+        pec = bool(value)
         if pec != self._pec:
             if ioctl(self._fd, SMBUS.I2C_PEC, pec):
                 raise IOError(ffi.errno)

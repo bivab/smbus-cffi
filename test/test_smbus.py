@@ -1,6 +1,8 @@
 from smbus import SMBus, ffi, list_to_smbus_data, smbus_data_to_list
 import py
 
+def pytest_funcarg__smbus(*args, **kwargs):
+    return SMBus(1)
 
 class SMBusProxy(object):
     def __init__(self, bus=-1):
@@ -43,11 +45,10 @@ def test_open():
     if hasattr(bus, '_fd'):
         assert b.fd != -1
 
-def test_write_quick(): 
-    bus = SMBus(1)
+def test_write_quick(smbus): 
     py.test.raises(TypeError, "bus.write_quick('a')")
-    py.test.raises(IOError, "bus.write_quick(4)")
-    bus.write_quick(1)
+    py.test.raises(IOError, "bus.write_quick(44)")
+    smbus.write_quick(1)
 
 
 def test_list_to_smbus_data():
@@ -64,3 +65,12 @@ def test_smbus_data_to_list():
     data = ffi.new("union i2c_smbus_data *")
     list_to_smbus_data(data, lst)
     assert smbus_data_to_list(data) == range(10)
+
+def test_pec(smbus):
+    assert not smbus.pec  # default value
+    smbus.pec = None
+    assert not smbus.pec
+    smbus.pec = 5
+    assert smbus.pec
+    smbus.pec = True
+    assert smbus.pec
