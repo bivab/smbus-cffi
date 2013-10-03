@@ -1,4 +1,5 @@
 # smbus.py - cffi based python bindings for SMBus based on smbusmodule.c
+# Copyright (C) 2013 <david.schneider@bivab.de>
 #
 # smbusmodule.c - Python bindings for Linux SMBus access through i2c-dev
 # Copyright (C) 2005-2007 Mark M. Hoffman <mhoffman@lightlink.com>
