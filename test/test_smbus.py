@@ -1,4 +1,4 @@
-from smbus import SMBus, ffi, list_to_smbus_data, smbus_data_to_list
+from smbus import SMBus
 import py
 
 def pytest_funcarg__smbus(*args, **kwargs):
@@ -52,6 +52,10 @@ def test_write_quick(smbus):
 
 
 def test_list_to_smbus_data():
+    try:
+        from smbus import ffi, list_to_smbus_data
+    except ImportError:
+        py.test.skip()
     lst = range(10)
     data = ffi.new("union i2c_smbus_data *")
     list_to_smbus_data(data, lst)
@@ -61,6 +65,10 @@ def test_list_to_smbus_data():
 
 
 def test_smbus_data_to_list():
+    try:
+        from smbus import ffi, list_to_smbus_data, smbus_data_to_list
+    except ImportError:
+        py.test.skip()
     lst = range(10)
     data = ffi.new("union i2c_smbus_data *")
     list_to_smbus_data(data, lst)
