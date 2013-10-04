@@ -13,14 +13,14 @@ setup(
     ext_package='smbus-cffi',
     ext_modules=[smbus.ffi.verifier.get_extension()],
     install_requires=['cffi ==0.6, ==0.7'],
-    license='MIT',
+    license='GPLv2',
 
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: End Users/Desktop',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
-        'License :: OSI Approved :: MIT License',
+	'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python :: 2.7',
         'Topic :: System :: Hardware',
