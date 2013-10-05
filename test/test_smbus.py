@@ -1,9 +1,6 @@
 from smbus import SMBus
 import py
 
-def pytest_funcarg__smbus(*args, **kwargs):
-    return SMBus(1)
-
 class SMBusProxy(object):
     def __init__(self, bus=-1):
         self.called = False
@@ -18,6 +15,7 @@ class SMBusProxy(object):
 
     def __getattr__(self, name, *args, **kwargs):
         return getattr(self.smbus, name, *args, **kwargs)
+
 
 class TestSMBus_init(object):
 
@@ -35,20 +33,6 @@ class TestSMBus_init(object):
             assert bus._pec == 0
         assert not bus.called
 
-
-def test_open():
-    bus = SMBus()
-    py.test.raises(IOError, 'bus.open(-13)')
-
-    bus.open(1)  # does not raise
-
-    if hasattr(bus, '_fd'):
-        assert b.fd != -1
-
-def test_write_quick(smbus): 
-    py.test.raises(TypeError, "bus.write_quick('a')")
-    py.test.raises(IOError, "bus.write_quick(44)")
-    smbus.write_quick(1)
 
 
 def test_list_to_smbus_data():
@@ -74,11 +58,3 @@ def test_smbus_data_to_list():
     list_to_smbus_data(data, lst)
     assert smbus_data_to_list(data) == range(10)
 
-def test_pec(smbus):
-    assert not smbus.pec  # default value
-    smbus.pec = None
-    assert not smbus.pec
-    smbus.pec = 5
-    assert smbus.pec
-    smbus.pec = True
-    assert smbus.pec

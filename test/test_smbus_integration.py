@@ -11,6 +11,7 @@ import py
 
 PORT = '/dev/ttyACM0'
 ADDR = 0x04
+BUS  = 1
 
 # Commands
 GETDATA = chr(254)
@@ -40,9 +41,39 @@ def command(testcase):
     return wrapper
 
 
+def pytest_funcarg__smbus(*args, **kwargs):
+    return SMBus(BUS)
+
+
+def test_open():
+    bus = SMBus()
+    py.test.raises(IOError, 'bus.open(-13)')
+
+    bus.open(BUS)  # does not raise
+
+    if hasattr(bus, '_fd'):
+        assert bus._fd != -1
+
+
+def test_write_quick(smbus): 
+    py.test.raises(TypeError, "smbus.write_quick('a')")
+    py.test.raises(IOError, "smbus.write_quick(44)")
+    smbus.write_quick(ADDR)
+
+
+def test_pec(smbus):
+    assert not smbus.pec  # default value
+    smbus.pec = None
+    assert not smbus.pec
+    smbus.pec = 5
+    assert smbus.pec
+    smbus.pec = True
+    assert smbus.pec
+
+
 class BaseSMBusIntegration(object):
     def setup_method(self, meth):
-        self.bus = SMBus(1)
+        self.bus = SMBus(BUS)
         self.serial = Serial(PORT, 9600)
         self.serial.write(RESET)
         time.sleep(DELAY)
@@ -171,6 +202,7 @@ class TestCompatMode(BaseSMBusIntegration):
         cmd = 123
         result = self.bus.process_call(ADDR, cmd, word)
         testcase, cmd2, word2 = self.getdata().split("#")
+        # in compat mode we do not get a return value
         assert result is None
         assert testcase == PROCESS_CALL
         assert cmd == ord(cmd2)
