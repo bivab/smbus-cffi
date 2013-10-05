@@ -236,6 +236,18 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         assert cmd == ord(cmd2)
         assert word == ord(word2[0]) | ord(word2[1]) << 8
 
+    @command(READ_BLOCK_DATA)
+    def test_read_block_data(self):
+        cmd = 217
+        block_data = self.bus.read_block_data(ADDR, cmd)
+        testcase, register = self.getdata().split("#")
+        assert testcase == READ_BLOCK_DATA
+        assert cmd == ord(register)
+        assert 0, 'incomplete'
+
+    @command(READ_BLOCK_DATA)
+    def test_read_block_data(self):
+        assert 0, 'incomplete'
 
 class TestCompatMode(BaseSMBusIntegration):
     @command(PROCESS_CALL)
