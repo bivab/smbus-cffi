@@ -61,12 +61,12 @@ typedef unsigned short int __u16;
 /* 
  * Data for SMBus Messages 
  */
-//#define I2C_SMBUS_BLOCK_MAX	32	/* As specified in SMBus standard */	
+//#define I2C_SMBUS_BLOCK_MAX       32    /* As specified in SMBus standard */
 union i2c_smbus_data {
-	__u8 byte;
-	__u16 word;
-	__u8 block[34]; /* block[0] is used for length */
-	                                            /* and one more for PEC */
+        __u8 byte;
+        __u16 word;
+        __u8 block[34]; /* block[0] is used for length */
+                        /* and one more for PEC */
 };
 
 
@@ -256,7 +256,7 @@ class SMBus(object):
 
     @pec.setter
     def pec(self, value):
-	"""True if Packet Error Codes (PEC) are enabled"""
+        """True if Packet Error Codes (PEC) are enabled"""
         pec = bool(value)
         if pec != self._pec:
             if ioctl(self._fd, SMBUS.I2C_PEC, pec):
