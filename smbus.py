@@ -210,10 +210,13 @@ class SMBus(object):
 
     @validate(addr=int, cmd=int)
     def read_block_data(self, addr, cmd):
+        # XXX untested, the raspberry pi i2c driver does not support this
+        # command
         self._set_addr(addr)
         data = ffi.new("union i2c_smbus_data *")
-        if SMBUS.i2c_smbus_access(self._fd, SMBUS.I2C_SMBUS_READ,
-                                  ffi.cast("__u8", cmd), 
+        if SMBUS.i2c_smbus_access(self._fd,
+                                  ffi.cast("char", SMBUS.I2C_SMBUS_READ),
+                                  ffi.cast("__u8", cmd),
                                   SMBUS.I2C_SMBUS_BLOCK_DATA,
                                   data):
             raise IOError(ffi.errno)
