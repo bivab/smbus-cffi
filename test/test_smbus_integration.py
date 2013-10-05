@@ -131,7 +131,8 @@ class TestSMBusIntegration(BaseSMBusIntegration):
 
     def setup_method(self, meth):
         BaseSMBusIntegration.setup_method(self, meth)
-        self.bus._compat = True
+        if hasattr(self.bus, '_compat'):
+            self.bus._compat = True
 
     @command(WRITE_QUICK)
     def test_write_quick(self):
