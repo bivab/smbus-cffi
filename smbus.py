@@ -93,12 +93,17 @@ SMBUS = ffi.verify("""
 #include <linux/i2c-dev.h>
 """, ext_package='smbus-cffi')
 
+
 class SMBus(object):
     """Return a new SMBus object that is (optionally) connected to the
     specified I2C device interface."""
     _fd = -1
     _addr = -1
     _pec = 0
+    # compat mode, enables some features that are not compatible with the original smbusmodule.c
+    _compat = False
+
+
 
     def __init__(self, bus=-1):
         if bus >= 0:
@@ -186,11 +191,20 @@ class SMBus(object):
 
     @validate(addr=int, cmd=int, val=int)
     def process_call(self, addr, cmd, val):
+        """"process_call(addr, cmd, val)
+            Perform SMBus Process Call transaction.
+            Note: although i2c_smbus_process_call returns a value, according to
+            smbusmodule.c this method does not return a value by default. Set
+            _compat = False on the SMBus instance to get a return value.
+        """
         self._set_addr(addr)
-        if SMBUS.i2c_smbus_process_call(self._fd,
-            ffi.cast("__u8", cmd),
-            ffi.cast("__u16", val)) == -1:
+        ret = SMBUS.i2c_smbus_process_call(self._fd,
+                                  ffi.cast("__u8", cmd),
+                                  ffi.cast("__u16", val))
+        if ret == -1:
             raise IOError(ffi.errno)
+        if self._compat:
+            return ret
 
     @validate(addr=int, cmd=int)
     def read_block_data(self, addr, cmd):
