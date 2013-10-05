@@ -34,6 +34,45 @@ WRITE_I2C_BLOCK_DATA = chr(13)
 
 DELAY = 1
 
+i2c_features = {}
+i2c_feature_map = {
+        'SMBus Quick Command': WRITE_QUICK,
+        'SMBus Send Byte': WRITE_BYTE,
+        'SMBus Receive Byte': READ_BYTE,
+        'SMBus Write Byte': WRITE_BYTE_DATA,
+        'SMBus Read Byte': READ_BYTE_DATA,
+        'SMBus Write Word': WRITE_WORD_DATA,
+        'SMBus Read Word': READ_WORD_DATA,
+        'SMBus Process Call': PROCESS_CALL,
+        'SMBus Block Write': WRITE_BLOCK_DATA,
+        'SMBus Block Read': READ_BLOCK_DATA,
+        'SMBus Block Process Call': BLOCK_PROCESS_CALL,
+        'SMBus PEC': -1,
+        'I2C Block Write': WRITE_I2C_BLOCK_DATA,
+        'I2C Block Read': READ_I2C_BLOCK_DATA,
+}
+
+
+def detect_i2c_features():
+    import subprocess
+    features = subprocess.check_output(["i2cdetect", "-F", "1"]).split('\n')[1:]
+    for line in features:
+        if line == '':
+            continue
+        for n in ('yes', 'no'):
+            i = line.find(n)
+            if i == -1:
+                continue
+            key = line[0:i-1].strip()
+            key = i2c_feature_map.get(key, -1)
+            i2c_features[key] = True if n == 'yes' else False
+            break
+        else:
+            import pdb; pdb.set_trace()
+
+detect_i2c_features()
+del detect_i2c_features
+
 def command(testcase):
     def wrapper(f):
         f.testcase = testcase
@@ -73,6 +112,8 @@ def test_pec(smbus):
 
 class BaseSMBusIntegration(object):
     def setup_method(self, meth):
+        if not i2c_features[meth.testcase]:
+            py.test.skip("smbus feature not supported")
         self.bus = SMBus(BUS)
         self.serial = Serial(PORT, 9600)
         self.serial.write(RESET)
