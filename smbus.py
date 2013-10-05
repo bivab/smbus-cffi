@@ -125,8 +125,10 @@ class SMBus(object):
         path = "/dev/i2c-%d" % (bus,)
         if len(path) >= MAXPATH:
                 raise OverflowError("Bus number is invalid.")
-
-        self._fd = os.open(path, os.O_RDWR, 0)
+        try:
+            self._fd = os.open(path, os.O_RDWR, 0)
+        except OSError, e:
+            raise IOError(e.errno)
 
     def _set_addr(self, addr):
         """private helper function"""
