@@ -1,8 +1,6 @@
 TODO:
 -----
 
+* Missing integration tests for READ_BLOCK_DATA and BLOCK_PROCESS_CALL, so far causes kernel panic on the raspberry pi
 testing:
   * write/read _i2c_block_data
-  * read/write _block_data
-  * block_process_call
-  * process_call
