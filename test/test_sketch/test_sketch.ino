@@ -1,7 +1,7 @@
 #include <Wire.h>
 
 #define I2C_SLAVE_ADDRESS 0x04
-#define BUFFER_SIZE 8
+#define BUFFER_SIZE 32
 
 #define WRITE_QUICK 1
 #define READ_BYTE 2   
@@ -319,3 +319,7 @@ void handle_READ_BLOCK_DATA() {
   data += "#";
   data += reg;
 }
+
+
+/* test write block data */
+void setup_test_WRITE_BLOCK_DATA() {}
