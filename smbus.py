@@ -221,14 +221,16 @@ class SMBus(object):
                                   data):
             raise IOError(ffi.errno)
         return smbus_data_to_list(block)
-        
+
     @validate(addr=int, cmd=int, vals=list)
     def write_block_data(self, addr, cmd, vals):
+        """"Perform SMBus Write Block Data transaction."""
         self._set_addr(addr)
         data = ffi.new("union i2c_smbus_data *")
-        list_to_smbus_data(data, vals)  
-        if SMBUS.i2c_smbus_access(self._fd, SMBUS.I2C_SMBUS_WRITE, 
-                                  ffi.cast("__u8", cmd), 
+        list_to_smbus_data(data, vals)
+        if SMBUS.i2c_smbus_access(self._fd,
+                                  ffi.cast("char", SMBUS.I2C_SMBUS_WRITE),
+                                  ffi.cast("__u8", cmd),
                                   SMBUS.I2C_SMBUS_BLOCK_DATA,
                                   data):
             raise IOError(ffi.errno)

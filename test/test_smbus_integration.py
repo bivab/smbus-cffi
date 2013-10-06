@@ -251,6 +251,18 @@ class TestSMBusIntegration(BaseSMBusIntegration):
     def test_block_process_call(self):
         assert 0, 'incomplete'
 
+    @command(WRITE_BLOCK_DATA)
+    def test_write_block_data(self):
+        data = range(65, 86)
+        cmd = 0x7
+        self.bus.write_block_data(ADDR, cmd, data)
+        d = self.getdata()
+        testcase, numbytes, reg, blockdata = d.split("#")
+        assert WRITE_BLOCK_DATA == int(testcase)
+        assert cmd == int(reg)
+        blockdata = [int(i) for i in blockdata.split('|')]
+        assert blockdata == [len(data)] + data
+
 class TestCompatMode(BaseSMBusIntegration):
     @command(PROCESS_CALL)
     def test_process_call(self):
