@@ -18,19 +18,19 @@ GETDATA = chr(254)
 RESET = chr(255)
 
 # Testcases
-WRITE_QUICK          = chr(1)
-READ_BYTE            = chr(2)
-WRITE_BYTE           = chr(3)
-READ_BYTE_DATA       = chr(4)
-WRITE_BYTE_DATA      = chr(5)
-READ_WORD_DATA       = chr(6)
-WRITE_WORD_DATA      = chr(7)
-PROCESS_CALL         = chr(8)
-READ_BLOCK_DATA      = chr(9)
-WRITE_BLOCK_DATA     = chr(10)
-BLOCK_PROCESS_CALL   = chr(11)
-READ_I2C_BLOCK_DATA  = chr(12)
-WRITE_I2C_BLOCK_DATA = chr(13)
+WRITE_QUICK          = 1
+READ_BYTE            = 2
+WRITE_BYTE           = 3
+READ_BYTE_DATA       = 4
+WRITE_BYTE_DATA      = 5
+READ_WORD_DATA       = 6
+WRITE_WORD_DATA      = 7
+PROCESS_CALL         = 8
+READ_BLOCK_DATA      = 9
+WRITE_BLOCK_DATA     = 10
+BLOCK_PROCESS_CALL   = 11
+READ_I2C_BLOCK_DATA  = 12
+WRITE_I2C_BLOCK_DATA = 13
 
 DELAY = 1
 
@@ -118,7 +118,7 @@ class BaseSMBusIntegration(object):
         self.serial = Serial(PORT, 9600)
         self.serial.write(RESET)
         time.sleep(DELAY)
-        self.serial.write(meth.testcase)
+        self.serial.write(chr(meth.testcase))
         time.sleep(DELAY)
 
     def getdata(self):
@@ -138,9 +138,9 @@ class TestSMBusIntegration(BaseSMBusIntegration):
     def test_write_quick(self):
         self.bus.write_quick(ADDR)
         data = self.getdata()
-        testcase, numbytes = data.split("#")
-        assert testcase == WRITE_QUICK
-        assert numbytes == chr(0)
+        testcase, numbytes = [int(i) for i in data.split("#")]
+        assert WRITE_QUICK == testcase
+        assert 0 == numbytes
 
     @command(READ_BYTE)
     def test_read_byte(self):
@@ -148,7 +148,7 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         time.sleep(DELAY)
         byte = self.bus.read_byte(ADDR)
         'read ', byte
-        data = self.getdata()
+        data = int(self.getdata())
         assert data == READ_BYTE
         assert byte == ord('n')
 
@@ -158,7 +158,7 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         time.sleep(DELAY)
         byte = self.bus.read_byte(ADDR)
         'read ', byte
-        data = self.getdata()
+        data = int(self.getdata())
         assert data == READ_BYTE
         assert byte ==  20
 
@@ -167,20 +167,20 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         byte = 31
         self.bus.write_byte(ADDR, byte)
         data = self.getdata()
-        testcase, numbytes, bytes = data.split("#")
+        testcase, numbytes, bytes = [int(i) for i in data.split("#")]
         assert testcase == WRITE_BYTE
-        assert numbytes == chr(1)
-        assert bytes == chr(31)
+        assert numbytes == 1
+        assert bytes == 31
 
     @command(READ_BYTE_DATA)
     def test_read_byte_data(self):
         cmd = 17
         byte = self.bus.read_byte_data(ADDR, cmd)
         data = self.getdata()
-        testcase, command, byte2 = data.split("#")
+        testcase, command, byte2 = [int(i) for i in data.split("#")]
         assert testcase == READ_BYTE_DATA
-        assert 17 == ord(command)
-        assert byte == ord(byte2)
+        assert 17 == command
+        assert byte == byte2
 
     @command(WRITE_BYTE_DATA)
     def test_write_byte_data(self):
@@ -189,13 +189,13 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         self.bus.write_byte_data(ADDR, cmd, byte)
         time.sleep(DELAY)
         data = self.getdata()
-        testcase, numbytes, command, byte2 = data.split("#")
+        testcase, numbytes, command, byte2 = [int(i) for i in data.split("#")]
         assert testcase == WRITE_BYTE_DATA
-        assert 2 == ord(numbytes)
-        assert cmd == ord(command)
-        assert byte == ord(byte2)
+        assert 2 == numbytes
+        assert cmd == command
+        assert byte == byte2
 
-    @command(READ_WORD_DATA)      
+    @command(READ_WORD_DATA)
     def test_read_word_data(self):
         bytes = [1<<6, 1<<7]
         word = bytes[1] << 8 | bytes[0]
@@ -206,8 +206,8 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         assert word == worddata
         data = self.getdata()
         testcase, cmd2, worddata2 = data.split("#")
-        assert testcase == READ_WORD_DATA
-        assert cmd == ord(cmd2)
+        assert int(testcase) == READ_WORD_DATA
+        assert cmd == int(cmd2)
         worddata2 = [ord(i) for i in worddata2]
         assert word == worddata2[1] << 8 | worddata2[0]
 
@@ -217,11 +217,11 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         cmd = 13
         self.bus.write_word_data(ADDR, cmd, word)
         data = self.getdata()
-        testcase, numbytes, cmd2, worddata = data.split("#")
-        assert testcase == WRITE_WORD_DATA
-        assert cmd == ord(cmd2) 
-        assert 3 == ord(numbytes)
-        worddata = [ord(i) for i in worddata]
+        testcase, numbytes, reg, worddata = data.split("#")
+        assert int(testcase) == WRITE_WORD_DATA
+        assert int(reg) == cmd
+        assert int(numbytes) == 3
+        worddata = [int(i) for i in worddata.split('|')]
         assert word == worddata[1] << 8 | worddata[0]
 
     @command(PROCESS_CALL)
@@ -229,24 +229,26 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         word = 0xFADE
         cmd = 123
         result = self.bus.process_call(ADDR, cmd, word)
-        testcase, cmd2, word2 = self.getdata().split("#")
-        if not self.bus._compat: # in compat mode we do not get a return value
+        data = self.getdata()
+        testcase, cmd2, byte1, byte2 = [int(i) for i in data.split("#")]
+        if hasattr(self.bus, '_compat') and not self.bus._compat: # in compat mode we do not get a return value
             assert result == 0xCAFE
         assert testcase == PROCESS_CALL
-        assert cmd == ord(cmd2)
-        assert word == ord(word2[0]) | ord(word2[1]) << 8
+        assert cmd == cmd2
+        assert word == byte1 | byte2 << 8
 
     @command(READ_BLOCK_DATA)
     def test_read_block_data(self):
         cmd = 217
         block_data = self.bus.read_block_data(ADDR, cmd)
-        testcase, register = self.getdata().split("#")
+        data = self.getdata()
+        testcase, register = [int(i) for i in data.split("#")]
         assert testcase == READ_BLOCK_DATA
-        assert cmd == ord(register)
+        assert cmd == register
         assert 0, 'incomplete'
 
-    @command(READ_BLOCK_DATA)
-    def test_read_block_data(self):
+    @command(BLOCK_PROCESS_CALL)
+    def test_block_process_call(self):
         assert 0, 'incomplete'
 
 class TestCompatMode(BaseSMBusIntegration):
@@ -255,9 +257,10 @@ class TestCompatMode(BaseSMBusIntegration):
         word = 0xFADE
         cmd = 123
         result = self.bus.process_call(ADDR, cmd, word)
-        testcase, cmd2, word2 = self.getdata().split("#")
+        data = self.getdata()
+        testcase, reg, byte1, byte2 = [int(i) for i in data.split("#")]
         # in compat mode we do not get a return value
         assert result is None
         assert testcase == PROCESS_CALL
-        assert cmd == ord(cmd2)
-        assert word == ord(word2[0]) | ord(word2[1]) << 8
+        assert cmd == reg
+        assert word == byte1 | byte2 << 8
