@@ -11,6 +11,9 @@
 #define READ_WORD_DATA 6
 #define WRITE_WORD_DATA 7
 #define PROCESS_CALL 8
+#define READ_BLOCK_DATA 9
+#define WRITE_BLOCK_DATA 10
+#define BLOCK_PROCESS_CALL 11
 
 #define GETDATA 254
 #define RESET 255
@@ -60,6 +63,13 @@ void loop() {
         break;
       case PROCESS_CALL:
         break;
+      case READ_BLOCK_DATA:
+        setup_test_READ_BLOCK_DATA();
+        break;
+      case WRITE_BLOCK_DATA:
+        setup_test_WRITE_BLOCK_DATA();
+        break;
+      case BLOCK_PROCESS_CALL:
       case -1:
         Serial.println("Error!!!");
       case RESET:
@@ -108,11 +118,16 @@ void i2c_receive_handler(int numbytes) {
     case WRITE_BYTE:
     case WRITE_BYTE_DATA:
     case WRITE_WORD_DATA:
+    case WRITE_BLOCK_DATA:
       handle_WRITE_xxx(numbytes);
       break;
     case PROCESS_CALL:
       handle_receive_PROCESS_CALL(numbytes);
       break;
+    case READ_BLOCK_DATA:
+      handle_receive_READ_BLOCK_DATA(numbytes);
+      break;
+    case BLOCK_PROCESS_CALL:
     default:
       data = "WTF!!!";
   }
@@ -132,6 +147,10 @@ void i2c_request_handler() {
     case PROCESS_CALL:
       handle_PROCESS_CALL();
       break;
+    case READ_BLOCK_DATA:
+      handle_READ_BLOCK_DATA();
+      break;
+    case BLOCK_PROCESS_CALL:
     default:
       Wire.write(-1);
   }
@@ -142,9 +161,9 @@ void setup_test_write_quick() {
 }
 void handle_WRITE_QUICK(int numbytes) {
   data = "";
-  data += (char) testcase;
+  data += testcase;
   data += "#";
-  data += (char) numbytes;
+  data += numbytes;
 }
 
 
@@ -160,7 +179,7 @@ void setup_test_read_byte() {
 void handle_READ_BYTE() {
   Wire.write(testdata);
   data = "";
-  data += (char) testcase;
+  data += testcase;
 }
 
 /* test write byte */
@@ -170,11 +189,11 @@ void setup_test_WRITE_BYTE() {
 void handle_WRITE_BYTE(int numbytes) {
   testdata = Wire.read();
   data = "";
-  data += (char) testcase;
+  data += testcase;
   data += "#";
-  data += (char) numbytes;
+  data += numbytes;
   data += "#";
-  data += (char) testdata;
+  data += testdata;
 }
 
 /* test read byte data */
@@ -188,24 +207,24 @@ void handle_READ_BYTE_DATA() {
   testdata = 234;
   Wire.write(testdata);
   data = "";
-  data += (char) testcase;
+  data +=  testcase;
   data += "#";
-  data += (char) reg;
+  data += reg;
   data += "#";
-  data += (char) testdata;
+  data += testdata;
 }
 
 /* test write byte data */
 void setup_test_WRITE_BYTE_DATA() {}
 void handle_WRITE_BYTE_DATA(int numbytes) {
     data = "";
-    data += (char) testcase;
+    data += testcase;
     data += "#";
-    data += (char) numbytes;
+    data += numbytes;
     data += "#";
-    data += (char) Wire.read();
+    data += Wire.read();
     data += "#";
-    data += (char) Wire.read();
+    data += Wire.read();
 }
 
 /* test read word data */
@@ -227,27 +246,30 @@ void handle_receive_READ_WORD_DATA(int numbytes) {
 void handle_READ_WORD_DATA() {
   Wire.write(i2c_buffer, 2);
   data = "";
-  data += (char) testcase;
+  data += testcase;
   data += "#";
-  data += (char) reg;
+  data += reg;
   data += "#";
-  data += (char) serial_buffer[0];
-  data += (char) serial_buffer[1];
+  data += serial_buffer[0];
+  data += serial_buffer[1];
 }
 
 /* test write word data */
 void setup_test_WRITE_WORD_DATA() {}
 void handle_WRITE_xxx(int numbytes) {
   data = "";
-  data += (char) testcase;
+  data +=  testcase;
   data += "#";
-  data += (char) numbytes;
+  data += numbytes;
   data += "#";
-  data += (char) Wire.read();
+  data += Wire.read();
   if(numbytes > 1) {
     data += "#";
     for(int i = 1; i < numbytes; i++) {
-      data += (char) Wire.read();
+      data += Wire.read();
+      if(i < numbytes - 1) {
+        data += "|";
+      }
     }
   }
 }
@@ -259,20 +281,41 @@ void handle_receive_PROCESS_CALL(int numbytes) {
     for(int i = 0; i < BUFFER_SIZE && Wire.available(); i++) {
       i2c_buffer[i] = Wire.read();
     }
-    Wire.write(13);
-    Wire.write(12);
 }
 
 void handle_PROCESS_CALL() {
   data = "";
-  data += (char) testcase;
+  data += testcase;
   data += "#";
-  data += (char) reg;
+  data += reg;
   data += "#";
-  for(int i = 0; i < BUFFER_SIZE; i++) {
-      data += (char) i2c_buffer[i];
-  }
-  Wire.write(123);
-  Wire.write(12);
+  data += i2c_buffer[0];
+  data += "#";
+  data += i2c_buffer[1];
+
+  i2c_buffer[1] = 0xca;
+  i2c_buffer[0] = 0xfe;
+  // two bytes return value
+  Wire.write(i2c_buffer, 2);
 }
 
+/* test read block data */
+void setup_test_READ_BLOCK_DATA() {
+  // prepare buffer to send block
+  for(int i = 0; i < BUFFER_SIZE; i++) {
+    i2c_buffer[i] = i + 100;
+  }
+}
+
+void handle_receive_READ_BLOCK_DATA(int numbytes) {
+  reg = Wire.read();
+  Serial.write(reg);
+  Serial.write(numbytes);
+}
+void handle_READ_BLOCK_DATA() {
+  Wire.write(i2c_buffer, BUFFER_SIZE);
+  data = "";
+  data += testcase;
+  data += "#";
+  data += reg;
+}
