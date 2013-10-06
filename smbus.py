@@ -46,7 +46,7 @@ typedef unsigned short int __u16;
 #define I2C_SMBUS_READ  ...
 #define I2C_SMBUS_WRITE ...
 
-/* SMBus transaction types (size parameter in the above functions) 
+/* SMBus transaction types (size parameter in the above functions)
    Note: these no longer correspond to the (arbitrary) PIIX4 internal codes! */
 #define I2C_SMBUS_QUICK             ...
 #define I2C_SMBUS_BYTE              ...
@@ -58,10 +58,10 @@ typedef unsigned short int __u16;
 #define I2C_SMBUS_BLOCK_PROC_CALL   ...   /* SMBus 2.0 */
 #define I2C_SMBUS_I2C_BLOCK_DATA    ...
 
-/* 
- * Data for SMBus Messages 
+/*
+ * Data for SMBus Messages
  */
-//#define I2C_SMBUS_BLOCK_MAX       32    /* As specified in SMBus standard */
+#define I2C_SMBUS_BLOCK_MAX         ...    /* As specified in SMBus standard */
 union i2c_smbus_data {
         __u8 byte;
         __u16 word;
@@ -270,7 +270,7 @@ class SMBus(object):
                                   SMBUS.I2C_SMBUS_I2C_BLOCK_BROKEN,
                                   data):
             raise IOError(ffi.errno)
-       
+
     @property
     def pec(self):
         return self._pec
@@ -283,7 +283,7 @@ class SMBus(object):
             if ioctl(self._fd, SMBUS.I2C_PEC, pec):
                 raise IOError(ffi.errno)
             self._pec = pec
-        
+
 
 
 def smbus_data_to_list(data):
@@ -291,9 +291,10 @@ def smbus_data_to_list(data):
     return [block[i+1] for i in range(block[0])]
 
 def list_to_smbus_data(data, vals):
-    if len(vals) > 32 or len(vals) == 0:
+    block_max = SMBUS.I2C_SMBUS_BLOCK_MAX
+    if len(vals) > block_max or len(vals) == 0:
         raise OverflowError("Third argument must be a list of at least one, "
-                            "but not more than 32 integers")
+                            "but not more than %d integers" % block_max)
     data.block[0] = len(vals)
     for i, val in enumerate(vals):
         data.block[i + 1] = val
