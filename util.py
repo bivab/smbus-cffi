@@ -16,14 +16,26 @@ def validate(**schema):
         code = fn.func_code
         nargs = code.co_argcount
         varnames = code.co_varnames
+        defaults = fn.func_defaults if fn.func_defaults else []
         def validator(*args):
-            if len(args) != nargs:
+            largs = len(args)
+            if largs != nargs and largs + len(defaults) != nargs:
                 raise TypeError("%s() takes exactly %d arguments (%d given)" %
                                 (fn.__name__, nargs, len(args)))
-            for name, typ in schema.iteritems():
-                i = varnames.index(name)
-                value = args[i]
+            for i, value in enumerate(args):
+                name = varnames[i]
+                if name not in schema:
+                    continue
+                typ = schema[name]
                 validators[typ](value)
+            if largs < nargs:
+                for i in range(largs, nargs):
+                    value = defaults[largs - i]
+                    name = varnames[i]
+                    if name not in schema:
+                        continue
+                    typ = schema[name]
+                    validators[typ](value)
             return fn(*args)
         return validator
     return wrapper

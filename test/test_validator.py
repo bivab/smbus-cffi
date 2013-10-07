@@ -10,6 +10,10 @@ def fn(a, b, c, d, e):
 def fn2(a, b, c, d):
     return (a, b, c, d)
 
+@validate(a=int, b=int, c=float)
+def fn3(a, b, c=3.2):
+    return (a, b, c)
+
 
 def test_all():
     assert fn(1, '123', 1.0, {'a':1}, [2]) == (1, '123', 1.0, {'a':1}, [2]) 
@@ -41,3 +45,8 @@ def test_dict():
 
 def test_partial_spec():
     assert fn2(1.0, 1, 'asdf', {'a': 2}) == (1.0, 1, 'asdf', {'a': 2})
+
+def test_default_arg():
+    assert fn3(1, 2) == (1, 2, 3.2)
+    assert fn3(1, 2, 4.1) == (1, 2, 4.1)
+    py.test.raises(TypeError, "fn3(1, 123, '1')")
