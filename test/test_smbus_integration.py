@@ -1,4 +1,4 @@
-# smbus integration test.  
+# smbus integration test.
 # Test the smbus-cffi implementation using an arduino sketch that implements
 # the smbus protocol using Wire.h. See test/test_sketch
 
@@ -262,6 +262,18 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         assert cmd == int(reg)
         blockdata = [int(i) for i in blockdata.split('|')]
         assert blockdata == [len(data)] + data
+
+    @command(READ_I2C_BLOCK_DATA)
+    def test_read_i2c_block_data(self):
+        cmd = 217
+        exp = range(100, 132)
+        blockdata = self.bus.read_i2c_block_data(ADDR, cmd)
+        data = self.getdata()
+        testcase, reg, numbytes = [int(i) for i in data.split("#")]
+        assert READ_I2C_BLOCK_DATA == int(testcase)
+        assert cmd == int(reg)
+        assert 1 == int(numbytes)
+        assert exp == blockdata
 
 class TestCompatMode(BaseSMBusIntegration):
     @command(PROCESS_CALL)

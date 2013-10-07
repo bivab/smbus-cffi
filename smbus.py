@@ -235,7 +235,7 @@ class SMBus(object):
                                   data):
             raise IOError(ffi.errno)
 
-    @validate(addr=int, cmd=int, len=int)
+    @validate(addr=int, cmd=int, vals=list)
     def block_process_call(self, addr, cmd, vals):
         self._set_addr(addr)
         data = ffi.new("union i2c_smbus_data *")
@@ -247,18 +247,18 @@ class SMBus(object):
             raise IOError(ffi.errno)
         return smbus_data_to_list(block)
 
-    @validate(addr=int, cmd=int, len=list)
-    def read_i2c_block_data(addr, cmd, len=32):
+    @validate(addr=int, cmd=int, len=int)
+    def read_i2c_block_data(self, addr, cmd, len=32):
         self._set_addr(addr)
         data = ffi.new("union i2c_smbus_data *")
         data.block[0] = len
         arg = SMBUS.I2C_SMBUS_I2C_BLOCK_BROKEN if len == 32 else SMBUS.I2C_SMBUS_I2C_BLOCK_DATA
         if SMBUS.i2c_smbus_access(self._fd,
-                                  SMBUS.I2C_SMBUS_READ,
-                                  ffi.cast("__u8", cmd), 
+                                  ffi.cast("char", SMBUS.I2C_SMBUS_READ),
+                                  ffi.cast("__u8", cmd),
                                   arg, data):
             raise IOError(ffi.errno)
-        return smbus_data_to_list(block)
+        return smbus_data_to_list(data)
 
     @validate(addr=int, cmd=int, vals=list)
     def write_i2c_block_data(addr, cmd, vals):
