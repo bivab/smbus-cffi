@@ -14,6 +14,7 @@
 #define READ_BLOCK_DATA 9
 #define WRITE_BLOCK_DATA 10
 #define BLOCK_PROCESS_CALL 11
+#define READ_I2C_BLOCK_DATA 12
 
 #define GETDATA 254
 #define RESET 255
@@ -68,6 +69,9 @@ void loop() {
         break;
       case WRITE_BLOCK_DATA:
         setup_test_WRITE_BLOCK_DATA();
+        break;
+      case READ_I2C_BLOCK_DATA:
+        setup_test_READ_I2C_BLOCK_DATA();
         break;
       case BLOCK_PROCESS_CALL:
       case -1:
@@ -127,6 +131,9 @@ void i2c_receive_handler(int numbytes) {
     case READ_BLOCK_DATA:
       handle_receive_READ_BLOCK_DATA(numbytes);
       break;
+    case READ_I2C_BLOCK_DATA:
+      handle_recieve_READ_I2C_BLOCK_DATA(numbytes);
+      break;
     case BLOCK_PROCESS_CALL:
     default:
       data = "WTF!!!";
@@ -149,6 +156,9 @@ void i2c_request_handler() {
       break;
     case READ_BLOCK_DATA:
       handle_READ_BLOCK_DATA();
+      break;
+    case READ_I2C_BLOCK_DATA:
+      handle_READ_I2C_BLOCK_DATA();
       break;
     case BLOCK_PROCESS_CALL:
     default:
@@ -323,3 +333,24 @@ void handle_READ_BLOCK_DATA() {
 
 /* test write block data */
 void setup_test_WRITE_BLOCK_DATA() {}
+/* test read i2c block data */
+void setup_test_READ_I2C_BLOCK_DATA() {
+  // prepare buffer to send block
+  for(int i = 0; i < BUFFER_SIZE; i++) {
+    i2c_buffer[i] = 100+i;
+  }
+}
+void handle_recieve_READ_I2C_BLOCK_DATA(int numbytes) {
+  reg = Wire.read();
+  tmp = numbytes;
+
+}
+void handle_READ_I2C_BLOCK_DATA() {
+  data = "";
+  data += testcase;
+  data += "#";
+  data += reg;
+  data += "#";
+  data += tmp;
+  Wire.write(i2c_buffer, BUFFER_SIZE);
+}
