@@ -270,7 +270,10 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         blockdata = self.bus.read_i2c_block_data(ADDR, cmd)
         data = self.getdata()
         testcase, reg, numbytes = [int(i) for i in data.split("#")]
-        assert READ_I2C_BLOCK_DATA == int(testcase)
+        assert READ_I2C_BLOCK_DATA == testcase
+        assert cmd == reg
+        assert 1 == numbytes
+        assert exp == blockdata
 
     @command(WRITE_I2C_BLOCK_DATA)
     def test_write_i2c_block_data(self):
