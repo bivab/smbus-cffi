@@ -15,6 +15,7 @@
 #define WRITE_BLOCK_DATA 10
 #define BLOCK_PROCESS_CALL 11
 #define READ_I2C_BLOCK_DATA 12
+#define WRITE_I2C_BLOCK_DATA 13
 
 #define GETDATA 254
 #define RESET 255
@@ -73,6 +74,9 @@ void loop() {
       case READ_I2C_BLOCK_DATA:
         setup_test_READ_I2C_BLOCK_DATA();
         break;
+      case WRITE_I2C_BLOCK_DATA:
+        setup_test_WRITE_I2C_BLOCK_DATA();
+        break;
       case BLOCK_PROCESS_CALL:
       case -1:
         Serial.println("Error!!!");
@@ -123,6 +127,7 @@ void i2c_receive_handler(int numbytes) {
     case WRITE_BYTE_DATA:
     case WRITE_WORD_DATA:
     case WRITE_BLOCK_DATA:
+    case WRITE_I2C_BLOCK_DATA:
       handle_WRITE_xxx(numbytes);
       break;
     case PROCESS_CALL:
@@ -333,6 +338,7 @@ void handle_READ_BLOCK_DATA() {
 
 /* test write block data */
 void setup_test_WRITE_BLOCK_DATA() {}
+
 /* test read i2c block data */
 void setup_test_READ_I2C_BLOCK_DATA() {
   // prepare buffer to send block
@@ -354,3 +360,6 @@ void handle_READ_I2C_BLOCK_DATA() {
   data += tmp;
   Wire.write(i2c_buffer, BUFFER_SIZE);
 }
+
+/* test WRITE_I2C_BLOCK_DATA */
+void setup_test_WRITE_I2C_BLOCK_DATA() {}
