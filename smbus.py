@@ -169,7 +169,7 @@ class SMBus(object):
     @validate(addr=int, cmd=int, val=int)
     def write_byte_data(self, addr, cmd, val):
         self._set_addr(addr)
-        if SMBUS.i2c_smbus_write_byte_data(self._fd, 
+        if SMBUS.i2c_smbus_write_byte_data(self._fd,
             ffi.cast("__u8", cmd),
             ffi.cast("__u8", val)) == -1:
             raise IOError(ffi.errno)
@@ -215,7 +215,7 @@ class SMBus(object):
         self._set_addr(addr)
         data = ffi.new("union i2c_smbus_data *")
         if SMBUS.i2c_smbus_access(self._fd,
-                                  ffi.cast("char", SMBUS.I2C_SMBUS_READ),
+                                  chr(SMBUS.I2C_SMBUS_READ),
                                   ffi.cast("__u8", cmd),
                                   SMBUS.I2C_SMBUS_BLOCK_DATA,
                                   data):
@@ -229,7 +229,7 @@ class SMBus(object):
         data = ffi.new("union i2c_smbus_data *")
         list_to_smbus_data(data, vals)
         if SMBUS.i2c_smbus_access(self._fd,
-                                  ffi.cast("char", SMBUS.I2C_SMBUS_WRITE),
+                                  chr(SMBUS.I2C_SMBUS_WRITE),
                                   ffi.cast("__u8", cmd),
                                   SMBUS.I2C_SMBUS_BLOCK_DATA,
                                   data):
@@ -239,9 +239,9 @@ class SMBus(object):
     def block_process_call(self, addr, cmd, vals):
         self._set_addr(addr)
         data = ffi.new("union i2c_smbus_data *")
-        list_to_smbus_data(data, vals)  
+        list_to_smbus_data(data, vals)
         if SMBUS.i2c_smbus_access(self._fd, SMBUS.I2C_SMBUS_WRITE,
-                                  ffi.cast("__u8", cmd), 
+                                  ffi.cast("__u8", cmd),
                                   SMBUS.I2C_SMBUS_BLOCK_PROC_CALL,
                                   data):
             raise IOError(ffi.errno)
@@ -254,7 +254,7 @@ class SMBus(object):
         data.block[0] = len
         arg = SMBUS.I2C_SMBUS_I2C_BLOCK_BROKEN if len == 32 else SMBUS.I2C_SMBUS_I2C_BLOCK_DATA
         if SMBUS.i2c_smbus_access(self._fd,
-                                  ffi.cast("char", SMBUS.I2C_SMBUS_READ),
+                                  chr(SMBUS.I2C_SMBUS_READ),
                                   ffi.cast("__u8", cmd),
                                   arg, data):
             raise IOError(ffi.errno)
