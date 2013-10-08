@@ -261,12 +261,13 @@ class SMBus(object):
         return smbus_data_to_list(data)
 
     @validate(addr=int, cmd=int, vals=list)
-    def write_i2c_block_data(addr, cmd, vals):
+    def write_i2c_block_data(self, addr, cmd, vals):
         self._set_addr(addr)
         data = ffi.new("union i2c_smbus_data *")
-        list_to_smbus_data(data, vals)  
-        if SMBUS.i2c_smbus_access(self._fd, SMBUS.I2C_SMBUS_WRITE,
-                                  ffi.cast("__u8", cmd), 
+        list_to_smbus_data(data, vals)
+        if SMBUS.i2c_smbus_access(self._fd,
+                                  chr(SMBUS.I2C_SMBUS_WRITE),
+                                  ffi.cast("__u8", cmd),
                                   SMBUS.I2C_SMBUS_I2C_BLOCK_BROKEN,
                                   data):
             raise IOError(ffi.errno)

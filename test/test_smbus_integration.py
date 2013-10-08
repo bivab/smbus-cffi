@@ -271,8 +271,18 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         data = self.getdata()
         testcase, reg, numbytes = [int(i) for i in data.split("#")]
         assert READ_I2C_BLOCK_DATA == int(testcase)
+
+    @command(WRITE_I2C_BLOCK_DATA)
+    def test_write_i2c_block_data(self):
+        cmd = 217
+        exp = range(100, 131)
+        self.bus.write_i2c_block_data(ADDR, cmd, exp)
+        data = self.getdata()
+        testcase, numbytes, reg, blockdata = [i for i in data.split("#")]
+        blockdata = [int(i) for i in blockdata.split('|')]
+        assert WRITE_I2C_BLOCK_DATA == int(testcase)
         assert cmd == int(reg)
-        assert 1 == int(numbytes)
+        assert len(exp)+1 == int(numbytes)
         assert exp == blockdata
 
 class TestCompatMode(BaseSMBusIntegration):
