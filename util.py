@@ -37,5 +37,7 @@ def validate(**schema):
                     typ = schema[name]
                     validators[typ](value)
             return fn(*args)
+        validator.__name__ = fn.__name__
+        validator.__doc__ = fn.__doc__
         return validator
     return wrapper
