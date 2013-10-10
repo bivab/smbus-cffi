@@ -7,7 +7,7 @@ a bus adapter driver.
 
 This module is a pure python reimplementation of the python-smbus C-extension
 (http://www.lm-sensors.org/browser/i2c-tools/trunk/py-smbus/) and works on PyPy
-and CPython.
+and CPython 2.x.
 
 
 Notes

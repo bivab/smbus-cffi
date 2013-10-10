@@ -1,6 +1,7 @@
 TODO:
 -----
 
+* Python 3 support
 * Support kwargs in validator decorator
 * Missing integration tests for READ_BLOCK_DATA and BLOCK_PROCESS_CALL, so far causes kernel panic on the raspberry pi
 testing:
