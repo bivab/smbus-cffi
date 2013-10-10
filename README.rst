@@ -1,7 +1,121 @@
-SMBUS-CFFI
+smbus-cffi
 ==========
 
 This Python module allows SMBus access through the I2C /dev interface on Linux
 hosts. The host kernel must have I2C support, I2C device interface support, and
 a bus adapter driver.
 
+This module is a pure python reimplementation of the python-smbus C-extension
+(http://www.lm-sensors.org/browser/i2c-tools/trunk/py-smbus/) and works on PyPy
+and CPython.
+
+
+Notes
+-----
+
+Currently cffi, the module used for the bindings to C code, is rather slow
+loading a module. It might take a moment to load smbus, in particular on slow
+devices like a Raspeberry Pi. This behaviour will change in future relases of
+cffi.
+
+The SMBus methods read_block_data and block_process_call are not fully tested,
+and might not work correctly or as expected, see note below.
+
+*Note of caution for Raspberry Pi users*: when calling read_block_data and
+block_process_call the underlying i2c/smbus library/driver causes a kernel
+panic on the Raspberry Pi. Testing these features on other hardware would be a
+great way to contribute.
+
+
+Example
+-------
+
+Assuming you have a device connected at address 4 on the bus
+
+::
+
+  >>> from smbus import SMBus
+
+  >>> bus = SMBus(4)
+
+  >>> bus.write_quick()
+
+  >>> some_reg = 123
+
+  >>> bus.write_i2c_block_data(4, some_reg, [1, 4, 7])
+
+
+
+Installation
+------------
+
+There are several methods to install the package. *Note:* unfortunately when
+installing using pip or setup.py on CPython you first need to make sure that
+the cffi package is installed.
+
+1. pip install from PyPi
+::
+
+  pip install smbus-cffi
+
+2. pip install from git
+::
+
+  pip install git+https://github.com/bivab/smbus-cffi.git
+
+3. Clone the repository and run setup.py
+::
+
+  git clone https://github.com/bivab/smbus-cffi.git
+  python setup.py install
+
+
+Bug Reporting
+-------------
+
+To sumbit a bugreport use the GitHub bugtracker for the project:
+
+  https://github.com/bivab/smbus-cffi/issues
+
+
+Development
+-----------
+
+You can get the latest sourcecode from the repository hosted at GitHub
+https://github.com/bivab/smbus-cffi
+The file requirements.txt contains the list of dependencies needed to work with
+smbus-cffi.
+
+The project uses py.test for testing, to run the tests execute py.test on the
+test directory or one of the files.
+
+The file test/test_smbus_integration.py contains a set of integration tests for
+the smbus wrapper. To run the integrations tests you need an Arduino baord
+flashed with the sketch provided in test/test_sketch and has the serial port
+and the i2c pins connected the machine running the tests. The sketch implements
+the counterpart of the smbus protocol that reads and writes data for each test
+using smbus and the serial port.
+
+
+Dependencies
+------------
+
+
+Authors
+-------
+
+* David Schneider
+
+Author of the original smbus C extension:
+
+* Mark M. Hoffman
+
+
+Copyright
+---------
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 of the License.
+
+See LICENSE for full license text
