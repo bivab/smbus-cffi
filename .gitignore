@@ -1,6 +1,7 @@
 *.swp
 __pycache__
 *.pyc
+.tox
 py-smbus
 dist
 build
