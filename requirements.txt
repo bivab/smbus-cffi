@@ -6,4 +6,4 @@ pycparser
 pyserial
 pytest
 wsgiref
-wsgiref
+tox
