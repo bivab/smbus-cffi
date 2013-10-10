@@ -1,7 +1,7 @@
 from setuptools import setup
 try:  # explicitly check for cffi
     import cffi
-except ImportError, e:
+except ImportError:
     raise ImportError("Please install cffi first")
 import smbus
 

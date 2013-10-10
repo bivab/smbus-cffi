@@ -137,7 +137,7 @@ class SMBus(object):
                 raise OverflowError("Bus number is invalid.")
         try:
             self._fd = os.open(path, os.O_RDWR, 0)
-        except OSError, e:
+        except OSError as e:
             raise IOError(e.errno)
 
     def _set_addr(self, addr):
