@@ -1,3 +1,7 @@
+import sys
+
+PY3K = sys.version_info[0] == 3
+
 def get_validator(tp, name):
     def f(x):
         if not isinstance(x, tp):
@@ -13,15 +17,21 @@ for tp, name in [(int, 'integer'), (float, 'float'),
 
 def validate(**schema):
     def wrapper(fn):
-        code = fn.func_code
+        code = fn.__code__
         nargs = code.co_argcount
         varnames = code.co_varnames
-        defaults = fn.func_defaults if fn.func_defaults else []
+        if PY3K:
+            defaults = fn.__defaults__ if fn.__defaults__ else []
+            kwdefaults = fn.__kwdefaults__ if fn.__kwdefaults__ else {}
+        else:
+            defaults = fn.func_defaults if fn.func_defaults else []
+            kwdefaults = {}
         def validator(*args):
             largs = len(args)
-            if largs != nargs and largs + len(defaults) != nargs:
+
+            if largs != nargs and largs + len(defaults) + len(kwdefaults) != nargs:
                 raise TypeError("%s() takes exactly %d arguments (%d given)" %
-                                (fn.__name__, nargs, len(args)))
+                                (fn.__name__, nargs, len(args)+len(kwdefaults)))
             for i, value in enumerate(args):
                 name = varnames[i]
                 if name not in schema:
@@ -36,7 +46,7 @@ def validate(**schema):
                         continue
                     typ = schema[name]
                     validators[typ](value)
-            return fn(*args)
+            return fn(*args, **kwdefaults)
         validator.__name__ = fn.__name__
         validator.__doc__ = fn.__doc__
         return validator

@@ -1,5 +1,6 @@
 from util import validate
 import py
+import sys
 
 @validate(a=int, b=str, c=float, d=dict, e=list)
 def fn(a, b, c, d, e):
@@ -50,3 +51,9 @@ def test_default_arg():
     assert fn3(1, 2) == (1, 2, 3.2)
     assert fn3(1, 2, 4.1) == (1, 2, 4.1)
     py.test.raises(TypeError, "fn3(1, 123, '1')")
+
+@py.test.mark.skipif("sys.version_info[0] < 3")
+def test_default_kwarg():
+    args = [1,2]
+    assert fn3(*args) == (1, 2, 3.2)
+    # currently not supported assert fn3(*args, c=4) == (1, 2, 4)
