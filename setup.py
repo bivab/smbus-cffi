@@ -21,7 +21,7 @@ setup(
     zip_safe=False,
     ext_package='smbus',
     ext_modules=[smbus.ffi.verifier.get_extension()],
-    install_requires=['cffi ==0.6, ==0.7'],
+    install_requires=['cffi >=0.6'],
     license='GPLv2',
 
     classifiers=[
