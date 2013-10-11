@@ -1,4 +1,4 @@
-from util import validate
+from smbus.util import validate
 import py
 import sys
 

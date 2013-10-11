@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 try:  # explicitly check for cffi
     import cffi
 except ImportError:
@@ -17,7 +17,7 @@ setup(
     author='David Schneider',
     author_email='david.schneider@bivab.de',
     url='https://github.com/bivab/smbus-cffi',
-    py_modules=['smbus', 'util'],
+    packages=find_packages(),
     zip_safe=False,
     ext_package='smbus-cffi',
     ext_modules=[smbus.ffi.verifier.get_extension()],
