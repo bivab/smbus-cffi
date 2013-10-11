@@ -17,7 +17,7 @@ setup(
     author='David Schneider',
     author_email='david.schneider@bivab.de',
     url='https://github.com/bivab/smbus-cffi',
-    packages=find_packages(),
+    packages=find_packages(exclude=["test*", "*test*"]),
     zip_safe=False,
     ext_package='smbus',
     ext_modules=[smbus.ffi.verifier.get_extension()],
