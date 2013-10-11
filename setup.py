@@ -14,7 +14,7 @@ setup(
     long_description=long_description,
     author='David Schneider',
     author_email='david.schneider@bivab.de',
-    url='https://bitbucket.org/bivab/smbus-cffi',
+    url='https://github.com/bivab/smbus-cffi',
     py_modules=['smbus', 'util'],
     zip_safe=False,
     ext_package='smbus-cffi',
