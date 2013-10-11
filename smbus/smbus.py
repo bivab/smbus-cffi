@@ -91,7 +91,7 @@ static inline __s32 i2c_smbus_process_call(int file, __u8 command, __u16 value);
 SMBUS = ffi.verify("""
 #include <sys/types.h>
 #include <linux/i2c-dev.h>
-""", ext_package='smbus-cffi')
+""", ext_package='smbus')
 
 
 class SMBus(object):

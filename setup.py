@@ -19,7 +19,7 @@ setup(
     url='https://github.com/bivab/smbus-cffi',
     packages=find_packages(),
     zip_safe=False,
-    ext_package='smbus-cffi',
+    ext_package='smbus',
     ext_modules=[smbus.ffi.verifier.get_extension()],
     install_requires=['cffi ==0.6, ==0.7'],
     license='GPLv2',
