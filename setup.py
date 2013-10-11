@@ -23,13 +23,15 @@ setup(
     license='GPLv2',
 
     classifiers=[
+        'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
         'Development Status :: 3 - Alpha',
-        'Intended Audience :: End Users/Desktop',
         'Intended Audience :: Developers',
+        'Intended Audience :: End Users/Desktop',
         'Intended Audience :: System Administrators',
-	'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: System :: Hardware',
     ],
 )
