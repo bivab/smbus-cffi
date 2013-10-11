@@ -13,13 +13,13 @@ and CPython 2.7.
 Notes
 -----
 
-Currently cffi, the module used for the bindings to C code, is rather slow
-loading a module. It might take a moment to load smbus, in particular on slow
-devices like a Raspeberry Pi. This behaviour will change in future relases of
-cffi.
+Currently cffi, the module used for the bindings to the smbus library, is
+rather slow loading a module. It might take a moment to load smbus, in
+particular on slow devices like a Raspeberry Pi. This behaviour will change in
+future releases of cffi.
 
 The SMBus methods read_block_data and block_process_call are not fully tested,
-and might not work correctly or as expected, see note below.
+and might not work correctly, see note below.
 
 *Note of caution for Raspberry Pi users*: when calling read_block_data and
 block_process_call the underlying i2c/smbus library/driver causes a kernel
@@ -73,7 +73,7 @@ the cffi package is installed.
 Bug Reporting
 -------------
 
-To sumbit a bugreport use the GitHub bugtracker for the project:
+To submit a bugreport use the GitHub bugtracker for the project:
 
   https://github.com/bivab/smbus-cffi/issues
 
@@ -81,24 +81,29 @@ To sumbit a bugreport use the GitHub bugtracker for the project:
 Development
 -----------
 
-You can get the latest sourcecode from the repository hosted at GitHub
+You can get the latest version from the repository hosted at GitHub
 https://github.com/bivab/smbus-cffi
 The file requirements.txt contains the list of dependencies needed to work with
 smbus-cffi.
 
-The project uses py.test for testing, to run the tests execute py.test on the
-test directory or one of the files.
+The project uses py.test for testing and tox to test on pypy and python 2.7.
 
 The file test/test_smbus_integration.py contains a set of integration tests for
-the smbus wrapper. To run the integrations tests you need an Arduino baord
-flashed with the sketch provided in test/test_sketch and has the serial port
-and the i2c pins connected the machine running the tests. The sketch implements
-the counterpart of the smbus protocol that reads and writes data for each test
-using smbus and the serial port.
+the smbus wrapper. To run the integrations tests you need an Arduino board
+flashed with the sketch provided in test/test_sketch.  The serial port and the
+i2c pins of the Arduino board need to be connected to the machine running the
+tests. The sketch implements the counterpart of the smbus protocol that reads
+and writes data for each test using smbus and the serial port.
 
 
 Dependencies
 ------------
+
+To install smbus-cffi you will need:
+
+* A C compiler
+* i2c development headers
+* PyPy or CPython development headers
 
 
 Authors
