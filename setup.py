@@ -1,3 +1,4 @@
+import os
 from setuptools import setup
 try:  # explicitly check for cffi
     import cffi
@@ -5,7 +6,8 @@ except ImportError:
     raise ImportError("Please install cffi first")
 import smbus
 
-with open('README.rst') as f:
+readme = os.path.join(os.path.dirname(__file__), 'README.rst')
+with open(readme) as f:
         long_description = f.read()
 setup(
     name='smbus-cffi',
