@@ -5,10 +5,13 @@ except ImportError:
     raise ImportError("Please install cffi first")
 import smbus
 
+with open('README.rst') as f:
+        long_description = f.read()
 setup(
     name='smbus-cffi',
     version='0.1',
     description='This Python module allows SMBus access through the I2C /dev interface on Linux hosts. The host kernel must have I2C support, I2C device interface support, and a bus adapter driver.',
+    long_description=long_description,
     author='David Schneider',
     author_email='david.schneider@bivab.de',
     url='https://bitbucket.org/bivab/smbus-cffi',
