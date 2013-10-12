@@ -1,0 +1,37 @@
+Source: smbus-cffi
+Maintainer: David Schneider <david.schneider@bivab.de>
+Section: python
+Priority: optional
+Build-Depends: 
+               pypy-setuptools (>= 0.6b3),
+               pypy-upstream (>= 2.1),
+               pypy-upstream-dev (>= 2.1),
+               debhelper (>= 7)
+Standards-Version: 3.8.4
+Homepage: https://github.com/bivab/smbus-cffi
+
+Package: pypy-smbus-cffi
+Architecture: any
+Pre-Depends: pypy-upstream (>= 2.1), pypy-upstream-dev (>= 2.1)
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: This Python module allows SMBus access through the I2C /dev 
+ smbus-cffi
+ ==========
+ .
+ This Python module allows SMBus access through the I2C /dev interface on Linux
+ hosts. The host kernel must have I2C support, I2C device interface support, and
+ a bus adapter driver.
+ .
+ This module is a cffi-based python reimplementation of the python-smbus C-extension
+ (http://www.lm-sensors.org/browser/i2c-tools/trunk/py-smbus/) and works on PyPy
+ and CPython 2.7.
+ .
+ .
+ Notes
+ -----
+ .
+ Currently cffi, the module used for the bindings to the smbus library, is
+ rather slow loading a module. It might take a moment to load smbus, in
+ particular on slow devices like a Raspeberry Pi. This behaviour will change in
+ future releases of cffi.
+ .

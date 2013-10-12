@@ -1,0 +1,5 @@
+smbus-cffi (0.1-1) unstable; urgency=low
+
+  * deb packaging for pypy
+
+ -- David Schneider <david.schneider@bivab.de>  Sat, 12 Oct 2013 14:26:31 +0200

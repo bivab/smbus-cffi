@@ -1,0 +1,17 @@
+#!/usr/bin/make -f
+export DH_ALWAYS_EXCLUDE=.git:*.swp:*.swo
+
+%:
+	dh $@ --without python-support
+
+override_dh_auto_clean:
+	pypy setup.py clean -a
+
+override_dh_auto_build:
+	pypy setup.py build
+
+override_dh_auto_install:
+	pypy setup.py install --root=$(CURDIR)/debian/tmp
+
+override_dh_builddeb:
+	dh_builddeb -- -Zxz
