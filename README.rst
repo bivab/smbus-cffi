@@ -5,7 +5,7 @@ This Python module allows SMBus access through the I2C /dev interface on Linux
 hosts. The host kernel must have I2C support, I2C device interface support, and
 a bus adapter driver.
 
-This module is a pure python reimplementation of the python-smbus C-extension
+This module is a cffi-based python reimplementation of the python-smbus C-extension
 (http://www.lm-sensors.org/browser/i2c-tools/trunk/py-smbus/) and works on PyPy
 and CPython 2.7.
 
