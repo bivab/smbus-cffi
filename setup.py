@@ -1,9 +1,9 @@
+from setuptools import setup, find_packages, Distribution
+
+Distribution(attrs=dict(setup_requires=['cffi']))
+
+import cffi
 import os
-from setuptools import setup, find_packages
-try:  # explicitly check for cffi
-    import cffi
-except ImportError:
-    raise ImportError("Please install cffi first")
 import smbus
 
 readme = os.path.join(os.path.dirname(__file__), 'README.rst')
