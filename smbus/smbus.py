@@ -29,7 +29,7 @@ module usually must have root permissions."""
 from util import validate
 from fcntl import ioctl
 import os
-MAXPATH=16
+MAXPATH = 16
 
 from cffi import FFI
 
@@ -69,7 +69,6 @@ union i2c_smbus_data {
                         /* and one more for PEC */
 };
 
-
 static inline __s32 i2c_smbus_access(int file, char read_write, __u8 command, int size, union i2c_smbus_data *data);
 
 static inline __s32 i2c_smbus_write_quick(int file, __u8 value);
@@ -107,8 +106,6 @@ class SMBus(object):
     # original smbusmodule.c
     _compat = False
 
-
-
     def __init__(self, bus=-1):
         if bus >= 0:
             self.open(bus)
@@ -143,7 +140,7 @@ class SMBus(object):
     def _set_addr(self, addr):
         """private helper method"""
         if self._addr != addr:
-            ret = ioctl(self._fd, SMBUS.I2C_SLAVE, addr)
+            ioctl(self._fd, SMBUS.I2C_SLAVE, addr)
             self._addr = addr
 
     @validate(addr=int)
@@ -185,10 +182,10 @@ class SMBus(object):
         Perform SMBus Read Byte Data transaction.
         """
         self._set_addr(addr)
-        result = SMBUS.i2c_smbus_read_byte_data(self._fd, ffi.cast("__u8", cmd))
-        if result == -1:
+        res = SMBUS.i2c_smbus_read_byte_data(self._fd, ffi.cast("__u8", cmd))
+        if res == -1:
             raise IOError(ffi.errno)
-        return result
+        return res
 
     @validate(addr=int, cmd=int, val=int)
     def write_byte_data(self, addr, cmd, val):
@@ -198,8 +195,8 @@ class SMBus(object):
         """
         self._set_addr(addr)
         if SMBUS.i2c_smbus_write_byte_data(self._fd,
-            ffi.cast("__u8", cmd),
-            ffi.cast("__u8", val)) == -1:
+                                           ffi.cast("__u8", cmd),
+                                           ffi.cast("__u8", val)) == -1:
             raise IOError(ffi.errno)
 
     @validate(addr=int, cmd=int)
@@ -222,8 +219,8 @@ class SMBus(object):
         """
         self._set_addr(addr)
         if SMBUS.i2c_smbus_write_word_data(self._fd,
-            ffi.cast("__u8", cmd),
-            ffi.cast("__u16", val)) == -1:
+                                           ffi.cast("__u8", cmd),
+                                           ffi.cast("__u16", val)) == -1:
             raise IOError(ffi.errno)
 
     @validate(addr=int, cmd=int, val=int)
@@ -239,8 +236,8 @@ class SMBus(object):
         """
         self._set_addr(addr)
         ret = SMBUS.i2c_smbus_process_call(self._fd,
-                                  ffi.cast("__u8", cmd),
-                                  ffi.cast("__u16", val))
+                                           ffi.cast("__u8", cmd),
+                                           ffi.cast("__u16", val))
         if ret == -1:
             raise IOError(ffi.errno)
         if self._compat:
@@ -262,7 +259,7 @@ class SMBus(object):
                                   SMBUS.I2C_SMBUS_BLOCK_DATA,
                                   data):
             raise IOError(ffi.errno)
-        return smbus_data_to_list(block)
+        return smbus_data_to_list(data)
 
     @validate(addr=int, cmd=int, vals=list)
     def write_block_data(self, addr, cmd, vals):
@@ -294,7 +291,7 @@ class SMBus(object):
                                   SMBUS.I2C_SMBUS_BLOCK_PROC_CALL,
                                   data):
             raise IOError(ffi.errno)
-        return smbus_data_to_list(block)
+        return smbus_data_to_list(data)
 
     @validate(addr=int, cmd=int, len=int)
     def read_i2c_block_data(self, addr, cmd, len=32):
@@ -305,7 +302,10 @@ class SMBus(object):
         self._set_addr(addr)
         data = ffi.new("union i2c_smbus_data *")
         data.block[0] = len
-        arg = SMBUS.I2C_SMBUS_I2C_BLOCK_BROKEN if len == 32 else SMBUS.I2C_SMBUS_I2C_BLOCK_DATA
+        if len == 32:
+            arg = SMBUS.I2C_SMBUS_I2C_BLOCK_BROKEN
+        else:
+            arg = SMBUS.I2C_SMBUS_I2C_BLOCK_DATA
         if SMBUS.i2c_smbus_access(self._fd,
                                   chr(SMBUS.I2C_SMBUS_READ),
                                   ffi.cast("__u8", cmd),
@@ -343,10 +343,10 @@ class SMBus(object):
             self._pec = pec
 
 
-
 def smbus_data_to_list(data):
     block = data.block
-    return [block[i+1] for i in range(block[0])]
+    return [block[i + 1] for i in range(block[0])]
+
 
 def list_to_smbus_data(data, vals):
     block_max = SMBUS.I2C_SMBUS_BLOCK_MAX
