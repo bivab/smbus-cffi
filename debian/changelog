@@ -1,3 +1,10 @@
+smbus-cffi (0.2-1) unstable; urgency=low
+
+  * improve packaing
+  * pep8 cleanups
+
+ -- David Schneider <david.schneider@bivab.de>  Wed, 30 Oct 2013 20:45:12 +0100
+
 smbus-cffi (0.1-1) unstable; urgency=low
 
   * deb packaging for pypy

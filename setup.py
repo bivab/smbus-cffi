@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages, Distribution
 
-Distribution(attrs=dict(setup_requires=['cffi']))
+Distribution(attrs=dict(setup_requires=['cffi >= 0.6']))
 
 import cffi
 import os
@@ -11,7 +11,7 @@ with open(readme) as f:
         long_description = f.read()
 setup(
     name='smbus-cffi',
-    version='0.1',
+    version='0.2',
     description='This Python module allows SMBus access through the I2C /dev interface on Linux hosts. The host kernel must have I2C support, I2C device interface support, and a bus adapter driver.',
     long_description=long_description,
     author='David Schneider',
@@ -21,7 +21,7 @@ setup(
     zip_safe=False,
     ext_package='smbus',
     ext_modules=[smbus.ffi.verifier.get_extension()],
-    install_requires=['cffi >=0.6'],
+    install_requires=['cffi >= 0.6'],
     license='GPLv2',
 
     classifiers=[
