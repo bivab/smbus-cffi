@@ -3,16 +3,17 @@ Maintainer: David Schneider <david.schneider@bivab.de>
 Section: python
 Priority: optional
 Build-Depends: 
-               pypy-setuptools (>= 0.6b3),
-               pypy-upstream (>= 2.1),
-               pypy-upstream-dev (>= 2.1),
+               pypy-setuptools (>= 1.1.6),
+               pypy-upstream (>= 2.2), pypy-upstream (<< 2.3),
+               pypy-upstream-dev (>= 2.2), pypy-upstream-dev (<< 2.3),
                debhelper (>= 7)
 Standards-Version: 3.8.4
 Homepage: https://github.com/bivab/smbus-cffi
 
 Package: pypy-smbus-cffi
 Architecture: any
-Pre-Depends: pypy-upstream (>= 2.1), pypy-upstream-dev (>= 2.1)
+Pre-Depends: pypy-upstream (>= 2.2), pypy-upstream (<< 2.3),
+             pypy-upstream-dev (>= 2.2), pypy-upstream-dev (<< 2.3),
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: This Python module allows SMBus access through the I2C /dev 
  smbus-cffi

@@ -1,3 +1,9 @@
+smbus-cffi (0.2-2) unstable; urgency=low
+
+  * Re-Package for pypy 2.2.1
+
+ -- David Schneider <david.schneider@bivab.de>  Thu, 28 Nov 2013 16:34:26 +0100
+
 smbus-cffi (0.2-1) unstable; urgency=low
 
   * improve packaing
