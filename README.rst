@@ -1,5 +1,7 @@
 smbus-cffi
 ==========
+.. image:: https://secure.travis-ci.org/bivab/smbus-cffi.svg
+    :target: http://travis-ci.org/bivab/smbus-cffi
 
 This Python module allows SMBus access through the I2C /dev interface on Linux
 hosts. The host kernel must have I2C support, I2C device interface support, and
