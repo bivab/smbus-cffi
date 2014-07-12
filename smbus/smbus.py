@@ -87,10 +87,14 @@ static inline __s32 i2c_smbus_process_call(int file, __u8 command, __u16 value);
 //static inline __s32 i2c_smbus_read_block_data(int file, __u8 command, __u8 *values)
 //static inline __s32 i2c_smbus_write_block_data(int file, __u8 command, __u8 length, const __u8 *values)
 """)
+
+include_dir = os.path.join(os.path.dirname(__file__), '..', 'include')
+
 SMBUS = ffi.verify("""
 #include <sys/types.h>
 #include <linux/i2c-dev.h>
-""", ext_package='smbus')
+""", ext_package='smbus',
+include_dirs=[include_dir])
 
 
 class SMBus(object):
