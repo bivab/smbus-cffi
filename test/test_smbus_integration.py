@@ -55,7 +55,10 @@ i2c_feature_map = {
 
 def detect_i2c_features():
     import subprocess
-    features = subprocess.check_output(["i2cdetect", "-F", "1"]).split('\n')[1:]
+    try:
+        features = subprocess.check_output(["i2cdetect", "-F", "1"]).split('\n')[1:]
+    except OSError:
+        py.test.skip("Requires i2cdetect command")
     for line in features:
         if line == '':
             continue
