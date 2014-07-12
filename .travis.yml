@@ -1,0 +1,21 @@
+language: python
+python: 2.7
+env:
+  - TOX_ENV=pep8
+  - TOX_ENV=py26
+  - TOX_ENV=py27
+  - TOX_ENV=pypy
+install:
+  - pip install --upgrade pip setuptools tox virtualenv
+matrix:
+  allow_failures:
+    - env: TOX_ENV=pep8
+    - env: TOX_ENV=flake8
+    - env: TOX_ENV=py26
+    - env: TOX_ENV=py27
+    - env: TOX_ENV=pypy
+script:
+  - tox -v -v -e $TOX_ENV
+after_failure:
+  - for X in .tox/$TOX_ENV/log/*; do echo "$X\n"; cat "$X"; echo "\n\n"; done
+  - echo "pip.log\n"; cat $HOME/.pip/pip.log
