@@ -1,11 +1,11 @@
 from smbus import SMBus
-import py
+
 
 class SMBusProxy(object):
     def __init__(self, bus=-1):
         self.called = False
         self.passed_args = ()
-        self.smbus = SMBus() 
+        self.smbus = SMBus()
         if bus != -1:
             self.open(bus)
 
@@ -34,7 +34,6 @@ class TestSMBus_init(object):
         assert not bus.called
 
 
-
 def test_list_to_smbus_data():
     from smbus import ffi, list_to_smbus_data
     lst = range(10)
@@ -42,7 +41,7 @@ def test_list_to_smbus_data():
     list_to_smbus_data(data, lst)
     assert data.block[0] == 10
     for i in lst:
-        assert data.block[i+1] == i
+        assert data.block[i + 1] == i
 
 
 def test_smbus_data_to_list():

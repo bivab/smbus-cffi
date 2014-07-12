@@ -93,8 +93,7 @@ include_dir = os.path.join(os.path.dirname(__file__), '..', 'include')
 SMBUS = ffi.verify("""
 #include <sys/types.h>
 #include <linux/i2c-dev.h>
-""", ext_package='smbus',
-include_dirs=[include_dir])
+""", ext_package='smbus', include_dirs=[include_dir])
 
 
 class SMBus(object):

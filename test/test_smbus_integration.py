@@ -4,52 +4,51 @@
 
 from serial import Serial
 from smbus import SMBus
-import smbus
 import time
 import py
 
 
 PORT = '/dev/ttyACM0'
 ADDR = 0x04
-BUS  = 1
+BUS = 1
 
 # Commands
 GETDATA = chr(254)
 RESET = chr(255)
 
 # Testcases
-WRITE_QUICK          = 1
-READ_BYTE            = 2
-WRITE_BYTE           = 3
-READ_BYTE_DATA       = 4
-WRITE_BYTE_DATA      = 5
-READ_WORD_DATA       = 6
-WRITE_WORD_DATA      = 7
-PROCESS_CALL         = 8
-READ_BLOCK_DATA      = 9
-WRITE_BLOCK_DATA     = 10
-BLOCK_PROCESS_CALL   = 11
-READ_I2C_BLOCK_DATA  = 12
+WRITE_QUICK = 1
+READ_BYTE = 2
+WRITE_BYTE = 3
+READ_BYTE_DATA = 4
+WRITE_BYTE_DATA = 5
+READ_WORD_DATA = 6
+WRITE_WORD_DATA = 7
+PROCESS_CALL = 8
+READ_BLOCK_DATA = 9
+WRITE_BLOCK_DATA = 10
+BLOCK_PROCESS_CALL = 11
+READ_I2C_BLOCK_DATA = 12
 WRITE_I2C_BLOCK_DATA = 13
 
 DELAY = 1
 
 i2c_features = {}
 i2c_feature_map = {
-        'SMBus Quick Command': WRITE_QUICK,
-        'SMBus Send Byte': WRITE_BYTE,
-        'SMBus Receive Byte': READ_BYTE,
-        'SMBus Write Byte': WRITE_BYTE_DATA,
-        'SMBus Read Byte': READ_BYTE_DATA,
-        'SMBus Write Word': WRITE_WORD_DATA,
-        'SMBus Read Word': READ_WORD_DATA,
-        'SMBus Process Call': PROCESS_CALL,
-        'SMBus Block Write': WRITE_BLOCK_DATA,
-        'SMBus Block Read': READ_BLOCK_DATA,
-        'SMBus Block Process Call': BLOCK_PROCESS_CALL,
-        'SMBus PEC': -1,
-        'I2C Block Write': WRITE_I2C_BLOCK_DATA,
-        'I2C Block Read': READ_I2C_BLOCK_DATA,
+    'SMBus Quick Command': WRITE_QUICK,
+    'SMBus Send Byte': WRITE_BYTE,
+    'SMBus Receive Byte': READ_BYTE,
+    'SMBus Write Byte': WRITE_BYTE_DATA,
+    'SMBus Read Byte': READ_BYTE_DATA,
+    'SMBus Write Word': WRITE_WORD_DATA,
+    'SMBus Read Word': READ_WORD_DATA,
+    'SMBus Process Call': PROCESS_CALL,
+    'SMBus Block Write': WRITE_BLOCK_DATA,
+    'SMBus Block Read': READ_BLOCK_DATA,
+    'SMBus Block Process Call': BLOCK_PROCESS_CALL,
+    'SMBus PEC': -1,
+    'I2C Block Write': WRITE_I2C_BLOCK_DATA,
+    'I2C Block Read': READ_I2C_BLOCK_DATA,
 }
 
 
@@ -66,15 +65,17 @@ def detect_i2c_features():
             i = line.find(n)
             if i == -1:
                 continue
-            key = line[0:i-1].strip()
+            key = line[0:i - 1].strip()
             key = i2c_feature_map.get(key, -1)
             i2c_features[key] = True if n == 'yes' else False
             break
         else:
-            import pdb; pdb.set_trace()
+            import pdb
+            pdb.set_trace()
 
 detect_i2c_features()
 del detect_i2c_features
+
 
 def command(testcase):
     def wrapper(f):
@@ -97,7 +98,7 @@ def test_open():
         assert bus._fd != -1
 
 
-def test_write_quick(smbus): 
+def test_write_quick(smbus):
     py.test.raises(TypeError, "smbus.write_quick('a')")
     py.test.raises(IOError, "smbus.write_quick(44)")
     smbus.write_quick(ADDR)
@@ -163,7 +164,7 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         'read ', byte
         data = int(self.getdata())
         assert data == READ_BYTE
-        assert byte ==  20
+        assert byte == 20
 
     @command(WRITE_BYTE)
     def test_write_byte(self):
@@ -200,7 +201,7 @@ class TestSMBusIntegration(BaseSMBusIntegration):
 
     @command(READ_WORD_DATA)
     def test_read_word_data(self):
-        bytes = [1<<6, 1<<7]
+        bytes = [1 << 6, 1 << 7]
         word = bytes[1] << 8 | bytes[0]
         cmd = 27
         self.serial.write(chr(bytes[0]) + chr(bytes[1]))
@@ -243,7 +244,7 @@ class TestSMBusIntegration(BaseSMBusIntegration):
     @command(READ_BLOCK_DATA)
     def test_read_block_data(self):
         cmd = 217
-        block_data = self.bus.read_block_data(ADDR, cmd)
+        self.bus.read_block_data(ADDR, cmd)
         data = self.getdata()
         testcase, register = [int(i) for i in data.split("#")]
         assert testcase == READ_BLOCK_DATA
@@ -288,8 +289,9 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         blockdata = [int(i) for i in blockdata.split('|')]
         assert WRITE_I2C_BLOCK_DATA == int(testcase)
         assert cmd == int(reg)
-        assert len(exp)+1 == int(numbytes)
+        assert len(exp) + 1 == int(numbytes)
         assert exp == blockdata
+
 
 class TestCompatMode(BaseSMBusIntegration):
     @command(PROCESS_CALL)
