@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages, Distribution
 
-Distribution(attrs=dict(setup_requires=['cffi >= 0.6']))
+Distribution(attrs=dict(setup_requires=['cffi >= 0.8']))
 
 import cffi
 import os
@@ -21,7 +21,7 @@ setup(
     zip_safe=False,
     ext_package='smbus',
     ext_modules=[smbus.ffi.verifier.get_extension()],
-    install_requires=['cffi >= 0.6'],
+    install_requires=['cffi >= 0.8'],
     license='GPLv2',
 
     classifiers=[
