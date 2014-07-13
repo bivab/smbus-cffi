@@ -60,13 +60,45 @@ Assuming you have a device connected at address 4 on the bus
   >>> bus.write_i2c_block_data(4, some_reg, [1, 4, 7])
 
 
+Dependencies
+------------
+
+To install smbus-cffi you will need:
+
+* A C compiler
+* i2c development headers
+* cffi (https://pypi.python.org/pypi/cffi/)
+* PyPy or CPython development headers
+
+https://metacpan.org/pod/Device::SMBus provides a good description on how to setup the dependencies.
+
+On Debian based distributions these can be installed with:
+
+::
+
+  sudo apt-get install build-essential libi2c-dev i2c-tools python-dev
+
+On Arch Linux:
+
+::
+
+  pacman -S base-devel
+  pacman -S i2c-tools
+
+
+Finally install cffi using pip or from source.
+
+::
+
+  pip install cffi
+
 
 Installation
 ------------
 
-There are several methods to install the package. *Note:* unfortunately when
-installing using pip or setup.py on CPython you first need to make sure that
-the cffi package is installed.
+There are several methods to install the package. First install the dependencies as described above. *Note:* unfortunately at the
+moment when installing using pip or setup.py on CPython you need to make sure
+that the cffi package already is installed.
 
 1. pip install from PyPi
 ::
@@ -110,15 +142,6 @@ i2c pins of the Arduino board need to be connected to the machine running the
 tests. The sketch implements the counterpart of the smbus protocol that reads
 and writes data for each test using smbus and the serial port.
 
-
-Dependencies
-------------
-
-To install smbus-cffi you will need:
-
-* A C compiler
-* i2c development headers
-* PyPy or CPython development headers
 
 
 Authors
