@@ -27,7 +27,7 @@ setup(
 
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Intended Audience :: End Users/Desktop',
         'Intended Audience :: System Administrators',
