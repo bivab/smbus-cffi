@@ -3,6 +3,19 @@ smbus-cffi
 .. image:: https://secure.travis-ci.org/bivab/smbus-cffi.svg
     :target: http://travis-ci.org/bivab/smbus-cffi
 
+.. image:: https://pypip.in/version/smbus-cffi/badge.png
+    :target: https://pypi.python.org/pypi/smbus-cffi/
+    :alt: Latest Version
+
+.. image:: https://pypip.in/format/smbus-cffi/badge.png
+    :target: https://pypi.python.org/pypi/smbus-cffi/
+    :alt: Download format
+
+.. image:: https://pypip.in/license/smbus-cffi/badge.png
+    :target: https://pypi.python.org/pypi/smbus-cffi/
+    :alt: License
+
+
 This Python module allows SMBus access through the I2C /dev interface on Linux
 hosts. The host kernel must have I2C support, I2C device interface support, and
 a bus adapter driver.
