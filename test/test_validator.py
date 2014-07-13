@@ -26,19 +26,19 @@ def test_missing_args():
 
 
 def test_int():
-    py.test.raises(TypeError, "fn(1.0, '123', 1.0, {'a', 2}, [1])")
+    py.test.raises(TypeError, "fn(1.0, '123', 1.0, {'a': 2}, [1])")
 
 
 def test_float():
-    py.test.raises(TypeError, "fn(1, '123', '1', {'a', 2}, [1])")
+    py.test.raises(TypeError, "fn(1, '123', '1', {'a': 2}, [1])")
 
 
 def test_string():
-    py.test.raises(TypeError, "fn(1, 123, '1', {'a', 2}, [1])")
+    py.test.raises(TypeError, "fn(1, 123, '1', {'a': 2}, [1])")
 
 
 def test_list():
-    py.test.raises(TypeError, "fn(1, 123, '1', {'a', 2}, '1')")
+    py.test.raises(TypeError, "fn(1, 123, '1', {'a': 2}, '1')")
 
 
 def test_dict():
