@@ -1,6 +1,5 @@
 argparse
 cffi
-distribute
 py
 pycparser
 pyserial
