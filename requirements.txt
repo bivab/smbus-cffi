@@ -1,8 +1,4 @@
-argparse
-cffi
-py
-pycparser
-pyserial
+-r requirements/base.txt
 pytest
-wsgiref
+pyserial
 tox
