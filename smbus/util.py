@@ -3,6 +3,14 @@ import sys
 PY3K = sys.version_info[0] == 3
 
 
+if PY3K:
+    # Based on six
+    def int2byte(x):
+        return bytes((x,))
+else:
+    int2byte = chr
+
+
 def get_validator(tp, name):
     def f(x):
         if not isinstance(x, tp):

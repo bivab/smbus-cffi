@@ -26,7 +26,8 @@ modules.
 Because the I2C device interface is opened R/W, users of this
 module usually must have root permissions."""
 
-from util import validate
+from .util import validate
+from .util import int2byte
 from fcntl import ioctl
 import os
 MAXPATH = 16
@@ -257,7 +258,7 @@ class SMBus(object):
         self._set_addr(addr)
         data = ffi.new("union i2c_smbus_data *")
         if SMBUS.i2c_smbus_access(self._fd,
-                                  chr(SMBUS.I2C_SMBUS_READ),
+                                  int2byte(SMBUS.I2C_SMBUS_READ),
                                   ffi.cast("__u8", cmd),
                                   SMBUS.I2C_SMBUS_BLOCK_DATA,
                                   data):
@@ -274,7 +275,7 @@ class SMBus(object):
         data = ffi.new("union i2c_smbus_data *")
         list_to_smbus_data(data, vals)
         if SMBUS.i2c_smbus_access(self._fd,
-                                  chr(SMBUS.I2C_SMBUS_WRITE),
+                                  int2byte(SMBUS.I2C_SMBUS_WRITE),
                                   ffi.cast("__u8", cmd),
                                   SMBUS.I2C_SMBUS_BLOCK_DATA,
                                   data):
@@ -310,7 +311,7 @@ class SMBus(object):
         else:
             arg = SMBUS.I2C_SMBUS_I2C_BLOCK_DATA
         if SMBUS.i2c_smbus_access(self._fd,
-                                  chr(SMBUS.I2C_SMBUS_READ),
+                                  int2byte(SMBUS.I2C_SMBUS_READ),
                                   ffi.cast("__u8", cmd),
                                   arg, data):
             raise IOError(ffi.errno)
@@ -326,7 +327,7 @@ class SMBus(object):
         data = ffi.new("union i2c_smbus_data *")
         list_to_smbus_data(data, vals)
         if SMBUS.i2c_smbus_access(self._fd,
-                                  chr(SMBUS.I2C_SMBUS_WRITE),
+                                  int2byte(SMBUS.I2C_SMBUS_WRITE),
                                   ffi.cast("__u8", cmd),
                                   SMBUS.I2C_SMBUS_I2C_BLOCK_BROKEN,
                                   data):
