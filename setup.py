@@ -12,7 +12,7 @@ with open(readme) as f:
 
 setup(
     name='smbus-cffi',
-    version='0.3.2',
+    version='0.4',
     description='This Python module allows SMBus access through the I2C /dev interface on Linux hosts. The host kernel must have I2C support, I2C device interface support, and a bus adapter driver.',
     long_description=long_description,
     author='David Schneider',
@@ -32,7 +32,12 @@ setup(
         'Intended Audience :: End Users/Desktop',
         'Intended Audience :: System Administrators',
         'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: System :: Hardware',
