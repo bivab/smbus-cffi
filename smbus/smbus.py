@@ -26,6 +26,7 @@ modules.
 Because the I2C device interface is opened R/W, users of this
 module usually must have root permissions."""
 
+from .__about__ import __version__
 from .util import validate
 from .util import int2byte
 from fcntl import ioctl
@@ -33,6 +34,8 @@ import os
 MAXPATH = 16
 
 from cffi import FFI
+
+so_name = 'smbus_cffi_' + __version__
 
 ffi = FFI()
 ffi.cdef("""
@@ -94,7 +97,8 @@ include_dir = os.path.join(os.path.dirname(__file__), '..', 'include')
 SMBUS = ffi.verify("""
 #include <sys/types.h>
 #include <linux/i2c-dev.h>
-""", ext_package='smbus', include_dirs=[include_dir])
+""", ext_package='smbus', modulename=so_name, include_dirs=[include_dir])
+# About modulename see https://cffi.readthedocs.org/en/release-0.8/#warning-about-modulename
 
 
 class SMBus(object):
