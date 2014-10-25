@@ -25,7 +25,7 @@ a bus adapter driver.
 
 This module is a cffi-based python reimplementation of the python-smbus C-extension
 (http://www.lm-sensors.org/browser/i2c-tools/trunk/py-smbus/) and works on PyPy
-and CPython 2.7.
+and CPython (2.6 and up).
 
 
 Notes
