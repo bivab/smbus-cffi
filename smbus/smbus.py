@@ -35,7 +35,7 @@ MAXPATH = 16
 
 from cffi import FFI
 
-so_name = 'smbus_cffi_' + __version__
+so_name = 'smbus_cffi_' + __version__.replace('.', '_')
 
 ffi = FFI()
 ffi.cdef("""
