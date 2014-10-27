@@ -133,10 +133,11 @@ Development
 
 You can get the latest version from the repository hosted at GitHub
 https://github.com/bivab/smbus-cffi
+
 The file requirements.txt contains the list of dependencies needed to work with
 smbus-cffi.
 
-The project uses py.test for testing and tox to test on pypy and python 2.7.
+The project uses py.test for testing and tox to test on pypy and python.
 
 The file test/test_smbus_integration.py contains a set of integration tests for
 the smbus wrapper. To run the integrations tests you need an Arduino board
