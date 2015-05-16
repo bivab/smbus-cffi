@@ -72,6 +72,7 @@ To install smbus-cffi you will need:
 * i2c development headers
 * cffi (https://pypi.python.org/pypi/cffi/)
 * PyPy or CPython development headers
+* libffi-dev is required CPython for cffi
 
 https://metacpan.org/pod/Device::SMBus provides a good description on how to setup the dependencies.
 
@@ -79,7 +80,7 @@ On Debian based distributions these can be installed with:
 
 ::
 
-  sudo apt-get install build-essential libi2c-dev i2c-tools python-dev
+  sudo apt-get install build-essential libi2c-dev i2c-tools python-dev libffi-dev
 
 On Arch Linux:
 
