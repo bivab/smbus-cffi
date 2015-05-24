@@ -1,10 +1,6 @@
-from setuptools import setup, find_packages, Distribution
+from setuptools import setup, find_packages
 
-Distribution(attrs=dict(setup_requires=['cffi >= 0.8']))
-
-import cffi
 import os
-import smbus
 
 base_dir = os.path.dirname(__file__)
 
@@ -15,6 +11,8 @@ with open(os.path.join(base_dir, "smbus", "__about__.py")) as f:
 readme = os.path.join(base_dir, 'README.rst')
 with open(readme) as f:
         long_description = f.read()
+
+CFFI_VERSION = '1.0.2'
 
 setup(
     name=about['__title__'],
@@ -28,8 +26,9 @@ setup(
     packages=find_packages(exclude=["test*", "*test*"]),
     zip_safe=False,
     ext_package='smbus',
-    ext_modules=[smbus.ffi.verifier.get_extension()],
-    install_requires=['cffi >= 0.8'],
+    install_requires=['cffi >= ' + CFFI_VERSION],
+    setup_requires=['cffi >= ' + CFFI_VERSION],
+    cffi_modules=["smbus/smbus_cffi_build.py:ffi"],
 
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
