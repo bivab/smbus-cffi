@@ -6,3 +6,6 @@ py-smbus
 dist
 build
 smbus_cffi.egg-info
+_smbus_cffi.[c,o]
+_smbus_cffi.*.so
+.eggs/
