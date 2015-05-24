@@ -10,9 +10,11 @@ import time
 import py
 
 if PY3K:
-    byte2int = lambda x: x
+    def byte2int(x):
+        return x
 else:
-    byte2int = lambda x: ord(x)
+    def byte2int(x):
+        return ord(x)
 
 
 PORT = '/dev/ttyACM0'
