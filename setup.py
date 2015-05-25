@@ -28,7 +28,7 @@ setup(
     ext_package='smbus',
     install_requires=['cffi >= ' + CFFI_VERSION],
     setup_requires=['cffi >= ' + CFFI_VERSION],
-    cffi_modules=["smbus/smbus_cffi_build.py:ffi"],
+    cffi_modules=["smbus_cffi_build.py:ffi"],
 
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',

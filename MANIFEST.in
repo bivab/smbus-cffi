@@ -1,2 +1,3 @@
 include README.rst LICENSE
 include include/linux/i2c-dev.h
+include smbus_cffi_build.py

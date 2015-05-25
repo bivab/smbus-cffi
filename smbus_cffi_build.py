@@ -59,7 +59,7 @@ static inline __s32 i2c_smbus_process_call(int file, __u8 command, __u16 value);
 //static inline __s32 i2c_smbus_write_block_data(int file, __u8 command, __u8 length, const __u8 *values)
 """)
 
-include_dir = os.path.join(os.path.dirname(__file__), '..', 'include')
+include_dir = os.path.join(os.path.dirname(__file__), 'include')
 
 ffi.set_source(module_name, """
 #include <sys/types.h>

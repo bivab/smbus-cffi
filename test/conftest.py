@@ -1,5 +1,5 @@
-try:
-    import cffi.verifier
-    cffi.verifier.cleanup_tmpdir()
-except ImportError:
-    pass
+from cffi.recompiler import recompile
+def pytest_configure(config):
+    from smbus_cffi_build import ffi
+    ffi.compile()
+
