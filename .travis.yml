@@ -1,13 +1,13 @@
 language: python
 python: 2.7
 env:
-  - TOX_ENV=pep8
-  - TOX_ENV=py26
-  - TOX_ENV=py27
-  - TOX_ENV=py32
-  - TOX_ENV=py33
-  - TOX_ENV=py34
-  - TOX_ENV=pypy
+  - TOX_ENV=pep8 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
+  - TOX_ENV=py26 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
+  - TOX_ENV=py27 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
+  - TOX_ENV=py32 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
+  - TOX_ENV=py33 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
+  - TOX_ENV=py34 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
+  - TOX_ENV=pypy PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
 install:
   - pip install --upgrade pip setuptools tox virtualenv
 matrix:
@@ -15,7 +15,8 @@ matrix:
     - env: TOX_ENV=pep8
     - env: TOX_ENV=flake8
 script:
-  - tox -v -v -e $TOX_ENV
+  - tox -e $TOX_ENV
 after_failure:
   - for X in .tox/$TOX_ENV/log/*; do echo "$X\n"; cat "$X"; echo "\n\n"; done
   - echo "pip.log\n"; cat $HOME/.pip/pip.log
+sudo: false
