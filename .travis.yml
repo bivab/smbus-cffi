@@ -1,5 +1,9 @@
 language: python
 python: 2.7
+before_install:
+  - wget https://bitbucket.org/pypy/pypy/downloads/pypy-2.6.0-linux64.tar.bz2
+  - tar -xvf pypy-2.6.0-linux64.tar.bz2
+  - mv pypy-2.6.0-linux64 /tmp/pypy
 env:
   - TOX_ENV=pep8 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
   - TOX_ENV=py26 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
