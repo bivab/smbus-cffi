@@ -12,7 +12,7 @@ readme = os.path.join(base_dir, 'README.rst')
 with open(readme) as f:
         long_description = f.read()
 
-CFFI_VERSION = '1.0.2'
+CFFI_VERSION = '1.1.0'
 
 setup(
     name=about['__title__'],
