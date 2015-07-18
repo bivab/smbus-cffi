@@ -1,19 +1,24 @@
 smbus-cffi
 ==========
+
 .. image:: https://secure.travis-ci.org/bivab/smbus-cffi.svg
     :target: http://travis-ci.org/bivab/smbus-cffi
 
-.. image:: https://pypip.in/version/smbus-cffi/badge.png
+.. image:: https://img.shields.io/pypi/v/smbus-cffi.svg
     :target: https://pypi.python.org/pypi/smbus-cffi/
     :alt: Latest Version
 
-.. image:: https://pypip.in/format/smbus-cffi/badge.png
+.. image:: https://img.shields.io/pypi/implementation/smbus-cffi.svg
     :target: https://pypi.python.org/pypi/smbus-cffi/
-    :alt: Download format
-
-.. image:: https://pypip.in/license/smbus-cffi/badge.png
+    :alt: Implementation
+    
+.. image:: https://img.shields.io/pypi/l/smbus-cffi.svg
     :target: https://pypi.python.org/pypi/smbus-cffi/
     :alt: License
+    
+.. image:: https://img.shields.io/pypi/format/smbus-cffi.svg
+    :target: https://pypi.python.org/pypi/smbus-cffi/
+    :alt: Download format
 
 .. image:: https://requires.io/github/bivab/smbus-cffi/requirements.png?branch=master
      :target: https://requires.io/github/bivab/smbus-cffi/requirements/?branch=master
