@@ -36,11 +36,6 @@ and CPython (2.6 and up).
 Notes
 -----
 
-Currently cffi, the module used for the bindings to the smbus library, is
-rather slow loading a module. It might take a moment to load smbus, in
-particular on slow devices like a Raspeberry Pi. This behaviour will change in
-future releases of cffi.
-
 The SMBus methods read_block_data and block_process_call are not fully tested,
 and might not work correctly, see note below.
 
