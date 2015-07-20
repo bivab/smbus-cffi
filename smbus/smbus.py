@@ -32,8 +32,8 @@ from .util import validate
 from .util import int2byte
 from fcntl import ioctl
 
-from _smbus_cffi import ffi
-from _smbus_cffi import lib as SMBUS
+from ._smbus_cffi import ffi
+from ._smbus_cffi import lib as SMBUS
 
 MAXPATH = 16
 
