@@ -1,7 +1,7 @@
 from cffi import FFI
 import os
 
-module_name = '_smbus_cffi'
+module_name = 'smbus._smbus_cffi'
 
 ffi = FFI()
 
