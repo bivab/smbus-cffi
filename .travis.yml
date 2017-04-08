@@ -6,9 +6,7 @@ before_install:
   - mv pypy-2.6.0-linux64 /tmp/pypy
 env:
   - TOX_ENV=pep8 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
-  - TOX_ENV=py26 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
   - TOX_ENV=py27 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
-  - TOX_ENV=py32 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
   - TOX_ENV=py33 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
   - TOX_ENV=py34 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
   - TOX_ENV=pypy PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
