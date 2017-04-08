@@ -7,7 +7,7 @@ from smbus import SMBus
 from smbus.util import int2byte
 from smbus.util import PY3K
 import time
-import py
+import pytest
 
 if PY3K:
     def byte2int(x):
@@ -68,7 +68,7 @@ def get_i2c_features():
                                   stdout=subprocess.PIPE).communicate()[0]
         return (i.decode('utf-8') for i in output.split(b'\n')[1:])
     except OSError:
-        py.test.skip("Requires i2cdetect command")
+        return []
 
 
 def detect_i2c_features():
@@ -91,6 +91,8 @@ def detect_i2c_features():
 detect_i2c_features()
 del detect_i2c_features
 
+pytestmark = pytest.mark.skipif(len(get_i2c_features()) == 0, reason='Tests require i2c')
+
 
 def command(testcase):
     def wrapper(f):
@@ -99,13 +101,15 @@ def command(testcase):
     return wrapper
 
 
-def pytest_funcarg__smbus(*args, **kwargs):
+@pytest.fixture
+def smbus(*args, **kwargs):
     return SMBus(BUS)
 
 
+@pytestmark
 def test_open():
     bus = SMBus()
-    py.test.raises(IOError, 'bus.open(-13)')
+    pytest.raises(IOError, 'bus.open(-13)')
 
     bus.open(BUS)  # does not raise
 
@@ -113,12 +117,14 @@ def test_open():
         assert bus._fd != -1
 
 
+@pytestmark
 def test_write_quick(smbus):
-    py.test.raises(TypeError, "smbus.write_quick('a')")
-    py.test.raises(IOError, "smbus.write_quick(44)")
+    pytest.raises(TypeError, "smbus.write_quick('a')")
+    pytest.raises(IOError, "smbus.write_quick(44)")
     smbus.write_quick(ADDR)
 
 
+@pytestmark
 def test_pec(smbus):
     assert not smbus.pec  # default value
     smbus.pec = None
@@ -132,7 +138,7 @@ def test_pec(smbus):
 class BaseSMBusIntegration(object):
     def setup_method(self, meth):
         if not i2c_features[meth.testcase]:
-            py.test.skip("smbus feature not supported")
+            pytest.mark.skip("smbus feature not supported")
         self.bus = SMBus(BUS)
         self.serial = Serial(PORT, 9600)
         self.serial.write(RESET)
@@ -146,6 +152,7 @@ class BaseSMBusIntegration(object):
         return self.serial.readline().strip()
 
 
+@pytestmark
 class TestSMBusIntegration(BaseSMBusIntegration):
 
     def setup_method(self, meth):
@@ -308,6 +315,7 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         assert exp == blockdata
 
 
+@pytestmark
 class TestCompatMode(BaseSMBusIntegration):
     @command(PROCESS_CALL)
     def test_process_call(self):
