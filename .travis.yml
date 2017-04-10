@@ -1,14 +1,17 @@
+dist: trusty
 language: python
-python: 2.7
+# python: 2.7
 before_install:
-  - wget https://bitbucket.org/pypy/pypy/downloads/pypy-2.6.0-linux64.tar.bz2
-  - tar -xvf pypy-2.6.0-linux64.tar.bz2
-  - mv pypy-2.6.0-linux64 /tmp/pypy
+  - wget https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.1-linux64.tar.bz2
+  - tar -xvf pypy2-v5.7.1-linux64.tar.bz2
+  - mv pypy2-v5.7.1-linux64 /tmp/pypy
 env:
   - TOX_ENV=pep8 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
   - TOX_ENV=py27 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
   - TOX_ENV=py33 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
   - TOX_ENV=py34 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
+  - TOX_ENV=py35 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
+  - TOX_ENV=py36 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
   - TOX_ENV=pypy PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
 install:
   - pip install --upgrade pip setuptools tox virtualenv
