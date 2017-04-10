@@ -1,6 +1,6 @@
 dist: trusty
 language: python
-python: 2.7
+# python: 2.7
 before_install:
   - wget https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.1-linux64.tar.bz2
   - tar -xvf pypy2-v5.7.1-linux64.tar.bz2
