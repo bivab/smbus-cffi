@@ -82,94 +82,94 @@ class SMBus(object):
         except OSError as e:
             raise IOError(e.errno)
 
-    def _set_addr(self, addr):
+    def _set_addr(self, addr, force=False):
         """private helper method"""
         if self._addr != addr:
-            ioctl(self._fd, SMBUS.I2C_SLAVE, addr)
+            ioctl(self._fd, SMBUS.I2C_SLAVE_FORCE if force else SMBUS.I2C_SLAVE, addr)
             self._addr = addr
 
-    @validate(addr=int)
-    def write_quick(self, addr):
+    @validate(addr=int, force=bool)
+    def write_quick(self, addr, force=False):
         """write_quick(addr)
 
         Perform SMBus Quick transaction.
         """
-        self._set_addr(addr)
+        self._set_addr(addr, force)
         if SMBUS.i2c_smbus_write_quick(self._fd, SMBUS.I2C_SMBUS_WRITE) != 0:
             raise IOError(ffi.errno)
 
-    @validate(addr=int)
-    def read_byte(self, addr):
+    @validate(addr=int, force=bool)
+    def read_byte(self, addr, force=False):
         """read_byte(addr) -> result
 
         Perform SMBus Read Byte transaction.
         """
-        self._set_addr(addr)
+        self._set_addr(addr, force)
         result = SMBUS.i2c_smbus_read_byte(self._fd)
         if result == -1:
             raise IOError(ffi.errno)
         return result
 
-    @validate(addr=int, val=int)
-    def write_byte(self, addr, val):
+    @validate(addr=int, val=int, force=bool)
+    def write_byte(self, addr, val, force=False):
         """write_byte(addr, val)
 
         Perform SMBus Write Byte transaction.
         """
-        self._set_addr(addr)
+        self._set_addr(addr, force)
         if SMBUS.i2c_smbus_write_byte(self._fd, ffi.cast("__u8", val)) == -1:
             raise IOError(ffi.errno)
 
-    @validate(addr=int, cmd=int)
-    def read_byte_data(self, addr, cmd):
+    @validate(addr=int, cmd=int, force=bool)
+    def read_byte_data(self, addr, cmd, force=False):
         """read_byte_data(addr, cmd) -> result
 
         Perform SMBus Read Byte Data transaction.
         """
-        self._set_addr(addr)
+        self._set_addr(addr, force)
         res = SMBUS.i2c_smbus_read_byte_data(self._fd, ffi.cast("__u8", cmd))
         if res == -1:
             raise IOError(ffi.errno)
         return res
 
-    @validate(addr=int, cmd=int, val=int)
-    def write_byte_data(self, addr, cmd, val):
+    @validate(addr=int, cmd=int, val=int, force=bool)
+    def write_byte_data(self, addr, cmd, val, force=False):
         """write_byte_data(addr, cmd, val)
 
         Perform SMBus Write Byte Data transaction.
         """
-        self._set_addr(addr)
+        self._set_addr(addr, force)
         if SMBUS.i2c_smbus_write_byte_data(self._fd,
                                            ffi.cast("__u8", cmd),
                                            ffi.cast("__u8", val)) == -1:
             raise IOError(ffi.errno)
 
-    @validate(addr=int, cmd=int)
-    def read_word_data(self, addr, cmd):
+    @validate(addr=int, cmd=int, force=bool)
+    def read_word_data(self, addr, cmd, force=False):
         """read_word_data(addr, cmd) -> result
 
         Perform SMBus Read Word Data transaction.
         """
-        self._set_addr(addr)
+        self._set_addr(addr, force)
         result = SMBUS.i2c_smbus_read_word_data(self._fd, ffi.cast("__u8", cmd))
         if result == -1:
             raise IOError(ffi.errno)
         return result
 
-    @validate(addr=int, cmd=int, val=int)
-    def write_word_data(self, addr, cmd, val):
+    @validate(addr=int, cmd=int, val=int, force=bool)
+    def write_word_data(self, addr, cmd, val, force=False):
         """write_word_data(addr, cmd, val)
 
         Perform SMBus Write Word Data transaction.
         """
-        self._set_addr(addr)
+        self._set_addr(addr, force)
         if SMBUS.i2c_smbus_write_word_data(self._fd,
                                            ffi.cast("__u8", cmd),
                                            ffi.cast("__u16", val)) == -1:
             raise IOError(ffi.errno)
 
-    @validate(addr=int, cmd=int, val=int)
-    def process_call(self, addr, cmd, val):
+    @validate(addr=int, cmd=int, val=int, force=bool)
+    def process_call(self, addr, cmd, val, force=False):
         """process_call(addr, cmd, val)
 
         Perform SMBus Process Call transaction.
@@ -179,7 +179,7 @@ class SMBus(object):
 
         Set _compat = False on the SMBus instance to get a return value.
         """
-        self._set_addr(addr)
+        self._set_addr(addr, force)
         ret = SMBUS.i2c_smbus_process_call(self._fd,
                                            ffi.cast("__u8", cmd),
                                            ffi.cast("__u16", val))
@@ -188,15 +188,15 @@ class SMBus(object):
         if self._compat:
             return ret
 
-    @validate(addr=int, cmd=int)
-    def read_block_data(self, addr, cmd):
+    @validate(addr=int, cmd=int, force=bool)
+    def read_block_data(self, addr, cmd, force=False):
         """read_block_data(addr, cmd) -> results
 
         Perform SMBus Read Block Data transaction.
         """
         # XXX untested, the raspberry pi i2c driver does not support this
         # command
-        self._set_addr(addr)
+        self._set_addr(addr, force)
         data = ffi.new("union i2c_smbus_data *")
         if SMBUS.i2c_smbus_access(self._fd,
                                   int2byte(SMBUS.I2C_SMBUS_READ),
@@ -206,13 +206,13 @@ class SMBus(object):
             raise IOError(ffi.errno)
         return smbus_data_to_list(data)
 
-    @validate(addr=int, cmd=int, vals=list)
-    def write_block_data(self, addr, cmd, vals):
+    @validate(addr=int, cmd=int, vals=list, force=bool)
+    def write_block_data(self, addr, cmd, vals, force=False):
         """write_block_data(addr, cmd, vals)
 
         Perform SMBus Write Block Data transaction.
         """
-        self._set_addr(addr)
+        self._set_addr(addr, force)
         data = ffi.new("union i2c_smbus_data *")
         list_to_smbus_data(data, vals)
         if SMBUS.i2c_smbus_access(self._fd,
@@ -222,13 +222,13 @@ class SMBus(object):
                                   data):
             raise IOError(ffi.errno)
 
-    @validate(addr=int, cmd=int, vals=list)
-    def block_process_call(self, addr, cmd, vals):
+    @validate(addr=int, cmd=int, vals=list, force=bool)
+    def block_process_call(self, addr, cmd, vals, force=False):
         """block_process_call(addr, cmd, vals) -> results
 
         Perform SMBus Block Process Call transaction.
         """
-        self._set_addr(addr)
+        self._set_addr(addr, force)
         data = ffi.new("union i2c_smbus_data *")
         list_to_smbus_data(data, vals)
         if SMBUS.i2c_smbus_access(self._fd, SMBUS.I2C_SMBUS_WRITE,
@@ -238,13 +238,13 @@ class SMBus(object):
             raise IOError(ffi.errno)
         return smbus_data_to_list(data)
 
-    @validate(addr=int, cmd=int, len=int)
-    def read_i2c_block_data(self, addr, cmd, len=32):
+    @validate(addr=int, cmd=int, len=int, force=bool)
+    def read_i2c_block_data(self, addr, cmd, len=32, force=False):
         """read_i2c_block_data(addr, cmd, len=32) -> results
 
         Perform I2C Block Read transaction.
         """
-        self._set_addr(addr)
+        self._set_addr(addr, force)
         data = ffi.new("union i2c_smbus_data *")
         data.block[0] = len
         if len == 32:
@@ -258,13 +258,13 @@ class SMBus(object):
             raise IOError(ffi.errno)
         return smbus_data_to_list(data)
 
-    @validate(addr=int, cmd=int, vals=list)
-    def write_i2c_block_data(self, addr, cmd, vals):
+    @validate(addr=int, cmd=int, vals=list, force=bool)
+    def write_i2c_block_data(self, addr, cmd, vals, force=False):
         """write_i2c_block_data(addr, cmd, vals)
 
         Perform I2C Block Write transaction.
         """
-        self._set_addr(addr)
+        self._set_addr(addr, force)
         data = ffi.new("union i2c_smbus_data *")
         list_to_smbus_data(data, vals)
         if SMBUS.i2c_smbus_access(self._fd,
