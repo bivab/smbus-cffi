@@ -20,7 +20,7 @@ def get_validator(tp, name):
 
 validators = {}
 for tp, name in [(int, 'integer'), (float, 'float'),
-                 (str, 'string'), (dict, 'dict'), (list, 'list')]:
+                 (str, 'string'), (dict, 'dict'), (list, 'list'), (bool, 'bool')]:
     validators[tp] = get_validator(tp, name)
 
 
