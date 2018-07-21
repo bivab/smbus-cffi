@@ -88,6 +88,7 @@ def detect_i2c_features():
             import pdb
             pdb.set_trace()
 
+
 detect_i2c_features()
 del detect_i2c_features
 
@@ -257,7 +258,7 @@ class TestSMBusIntegration(BaseSMBusIntegration):
         result = self.bus.process_call(ADDR, cmd, word)
         data = self.getdata()
         testcase, cmd2, byte1, byte2 = [int(i) for i in data.split(b"#")]
-        if hasattr(self.bus, '_compat') and not self.bus._compat: # in compat mode we do not get a return value
+        if hasattr(self.bus, '_compat') and not self.bus._compat:  # in compat mode we do not get a return value
             assert result == 0xCAFE
         assert testcase == PROCESS_CALL
         assert cmd == cmd2

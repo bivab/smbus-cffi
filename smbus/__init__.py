@@ -1,3 +1,5 @@
+# flake8: noqa
+
 from .smbus import ffi
 from .smbus import SMBus
 from .smbus import list_to_smbus_data

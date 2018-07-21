@@ -20,9 +20,9 @@ def test_smbus_data_to_list():
 
 def test_list_to_smbus_data_errors():
     data = ffi.new("union i2c_smbus_data *")
-    l = list(range(33))
+    lst = list(range(33))
     with pytest.raises(OverflowError):
-        list_to_smbus_data(data, l)
+        list_to_smbus_data(data, lst)
     # does not raise
     list_to_smbus_data(data, list(range(32)))
 

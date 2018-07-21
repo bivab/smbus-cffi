@@ -1,24 +1,39 @@
+group: travis_latest
 language: python
-python: 2.7
+matrix:
+    include:
+      - env: TOX_ENV=flake8
+        python: 3.7    # Run flake8 tests
+        dist: xenial   # required for Python 3.7
+        sudo: true     # required for Python 3.7
+      - env: TOX_ENV=py27
+        python: 2.7    # 2.7.14 pip  9.0.1
+      - env: TOX_ENV=py34
+        python: 3.4    # 3.4.6  pip  9.0.1
+      - env: TOX_ENV=py35
+        python: 3.5    # 3.5.5  pip  9.0.1
+      - env: TOX_ENV=py36
+        python: 3.6    # 3.6.3  pip  9.0.1
+      - env: TOX_ENV=py37
+        python: 3.7    # 3.7.0  pip 10.0.1
+        dist: xenial   # required for Python 3.7
+        sudo: true     # required for Python 3.7
+      - env: TOX_ENV=pypy
+        python: pypy   # 2.7.13 pip  9.0.1
+      - env: TOX_ENV=pypy3
+        python: pypy3  # 3.5.3  pip  9.0.1
 before_install:
-  - wget https://bitbucket.org/pypy/pypy/downloads/pypy-2.6.0-linux64.tar.bz2
-  - tar -xvf pypy-2.6.0-linux64.tar.bz2
-  - mv pypy-2.6.0-linux64 /tmp/pypy
-env:
-  - TOX_ENV=pep8 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
-  - TOX_ENV=py27 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
-  - TOX_ENV=py33 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
-  - TOX_ENV=py34 PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
-  - TOX_ENV=pypy PYPYPATH=/tmp/pypy/bin/pypy TOX_TESTENV_PASSENV="PYPYPATH"
+  - PYPY_VERSION=pypy2-v6.0.0-linux64  # pypy-2.6.0-linux64
+  - wget https://bitbucket.org/pypy/pypy/downloads/${PYPY_VERSION}.tar.bz2
+  - tar -xvf ${PYPY_VERSION}.tar.bz2
+  - ls /tmp
+  - mv ${PYPY_VERSION} /tmp/pypy
+  - export PYPYPATH=/tmp/pypy/bin/pypy
+  - export TOX_TESTENV_PASSENV="PYPYPATH"
 install:
   - pip install --upgrade pip setuptools tox virtualenv
-matrix:
-  allow_failures:
-    - env: TOX_ENV=pep8
-    - env: TOX_ENV=flake8
 script:
   - tox -e $TOX_ENV
 after_failure:
   - for X in .tox/$TOX_ENV/log/*; do echo "$X\n"; cat "$X"; echo "\n\n"; done
   - echo "pip.log\n"; cat $HOME/.pip/pip.log
-sudo: false
