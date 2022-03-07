@@ -14,6 +14,7 @@ with open(readme) as f:
 
 CFFI_VERSION = '1.1.0'
 
+package_list = find_packages(exclude=["test*", "*test*"])
 setup(
     name=about['__title__'],
     version=about['__version__'],
@@ -23,7 +24,9 @@ setup(
     author_email=about['__email__'],
     url=about['__uri__'],
     license=about['__license__'],
-    packages=find_packages(exclude=["test*", "*test*"]),
+    packages=package_list,
+    package_data={package_name: ['py.typed'] for package_name in package_list},
+    include_package_data=True,
     zip_safe=False,
     ext_package='smbus',
     install_requires=['cffi >= ' + CFFI_VERSION],
